@@ -1,0 +1,1890 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="author" content="Dmitrii Titaev">
+    <title>Software Shortcuts</title>
+    <style>
+        :root {
+            --bg-main: #0b0f19;     
+            --bg-panel: #0d1321;    
+            --bg-card: #131c2f;     
+            --border-dim: #1e293b;  
+            --text-base: #64748b;   
+            --text-main: #d4d4d4;   
+            --key-bg: #1e293b;
+            --active-bg: rgba(255,255,255,0.04);
+            --item-hover: rgba(255,255,255,0.02);
+        }
+
+        [data-theme="light"] {
+            --bg-main: #f8fafc;     
+            --bg-panel: #ffffff;    
+            --bg-card: #ffffff;     
+            --border-dim: #cbd5e1;  
+            --text-base: #64748b;   
+            --text-main: #333333;   
+            --key-bg: #f1f5f9; 
+            --active-bg: rgba(0,0,0,0.03);
+            --item-hover: rgba(0,0,0,0.02);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: Tahoma, "MS Sans Serif", sans-serif;
+            font-weight: 400;
+            display: flex;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            font-size: 11px;
+            -webkit-font-smoothing: none; 
+            font-smooth: never;
+            text-rendering: crispEdges; 
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-dim); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-base); }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border-dim);
+            display: flex;
+            flex-direction: column;
+            padding: 15px 15px 60px 15px; 
+            z-index: 10;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .brand {
+            font-size: 15px;
+            color: var(--text-main);
+            font-weight: bold;
+            margin-bottom: 14px; 
+            padding-left: 5px;
+            display: flex;
+            align-items: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            line-height: 1;
+        }
+
+        /* Search Box */
+        .search-box {
+            margin-bottom: 16px; 
+            padding: 0 11px 0 5px; 
+        }
+        .search-input {
+            width: 100%;
+            height: 34px; 
+            background: var(--bg-main);
+            border: 1px solid var(--border-dim);
+            color: var(--text-main);
+            padding: 0 10px;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 11px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input:focus { border-color: var(--text-base); }
+        .search-input::placeholder { color: var(--text-base); }
+
+        .nav-list {
+            flex: 1;
+            overflow-y: auto; 
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            padding: 0 5px;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-base);
+            padding: 6px 10px; 
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, border-color 0.2s;
+            display: flex;
+            align-items: center;
+            font-family: inherit;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-btn:hover { background: var(--item-hover); color: var(--text-main); }
+        .nav-btn.active { background: var(--active-bg); border-color: var(--border-dim); color: var(--app-color); }
+        
+        .nav-left { display: flex; align-items: center; gap: 10px; }
+        .nav-left > span { position: relative; top: -1px; }
+        
+        .logo-box {
+            font-weight: normal; 
+            font-size: 11px; 
+            letter-spacing: 0; 
+            color: inherit;
+            width: 20px; 
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1; 
+            border: 1px solid currentColor; 
+            border-radius: 4px; 
+            transition: opacity 0.2s;
+            opacity: 0.8; 
+        }
+        .nav-btn:hover .logo-box, .nav-btn.active .logo-box { opacity: 1; }
+
+        /* Sidebar Bottom */
+        .sidebar-bottom {
+            margin-top: auto;
+            padding-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .theme-switch-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px; 
+            padding: 15px 5px 0 5px; 
+            border-top: 1px solid var(--border-dim);
+            color: var(--text-base); 
+        }
+        
+        .theme-label {
+            text-align: center;
+            font-size: 11px;
+            font-weight: normal;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: color 0.3s;
+            user-select: none;
+            line-height: 1;
+        }
+        
+        .label-light { position: relative; left: 2px; }
+
+        [data-theme="light"] .label-light { color: var(--text-main); }
+        [data-theme="light"] .label-dark { color: var(--text-base); }
+        [data-theme="dark"] .label-light { color: var(--text-base); }
+        [data-theme="dark"] .label-dark { color: var(--text-main); }
+
+        .theme-pill {
+            width: 38px;
+            height: 20px; 
+            border: 2px solid var(--text-base);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        
+        .theme-circle {
+            width: 12px;
+            height: 12px;
+            background: var(--text-base);
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s, background 0.3s;
+            transform: translateX(18px);
+        }
+        
+        [data-theme="light"] .theme-circle { transform: translateX(0px); }
+
+        /* Author Credit */
+        .author-credit {
+            align-self: center;
+            display: inline-block;
+            text-align: center;
+            font-size: 9px;
+            color: var(--text-base);
+            letter-spacing: 0.4px; 
+            text-transform: uppercase;
+            opacity: 0.5;
+            transition: opacity 0.3s, color 0.3s;
+            user-select: none;
+            text-decoration: none; 
+            line-height: 1;
+        }
+        .author-credit:hover { opacity: 1; color: var(--text-main); }
+
+        /* Main Content */
+        .main {
+            flex: 1; 
+            padding: 30px 40px; 
+            overflow-y: scroll; 
+            position: relative;
+            transition: background-color 0.3s;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .header {
+            margin-bottom: 25px; 
+            display: flex; 
+            align-items: flex-end; 
+            justify-content: space-between;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-dim);
+            transition: border-color 0.3s;
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: bold; 
+            color: var(--current-color);
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+        }
+
+        .header-meta, .header-meta a {
+            font-size: 9px;
+            color: var(--text-base);
+            letter-spacing: 0.4px; 
+            text-transform: uppercase;
+            text-decoration: none;
+            opacity: 0.8; 
+            transition: opacity 0.2s, color 0.2s;
+            font-weight: normal;
+            text-align: right;
+        }
+        .header-meta a:hover { color: var(--text-main); opacity: 1; }
+
+        /* Сетка колонок */
+        .grid {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            width: 100%;
+        }
+        .grid-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            min-width: 0;
+        }
+
+        /* Категории и элементы */
+        .category {
+            background: var(--bg-card);
+            border: 1px solid var(--current-color);
+            border-radius: 6px;
+            transition: background-color 0.3s;
+            overflow: hidden;
+            margin-bottom: 0; 
+        }
+
+        .cat-title {
+            padding: 10px 14px;
+            font-weight: bold; 
+            color: var(--current-color);
+            border-bottom: 1px solid var(--border-dim);
+            background: var(--active-bg); 
+            text-transform: uppercase;
+            font-size: 11px; letter-spacing: 0.5px;
+            cursor: pointer;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .cat-title::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-right: 2px solid currentColor;
+            border-bottom: 2px solid currentColor;
+            transform: rotate(45deg);
+            transition: transform 0.3s ease;
+            margin-right: 4px;
+        }
+
+        .category.collapsed .cat-title::after { transform: rotate(-45deg); }
+        .category.collapsed .cat-content { display: none; }
+
+        .item {
+            position: relative;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 14px; border-bottom: 1px solid var(--border-dim);
+            transition: background 0.2s;
+        }
+        .item:hover { background: var(--item-hover); }
+        .item:last-child { border-bottom: none; }
+        
+        .item::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0; width: 2px;
+            background-color: var(--current-color);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .item:hover::before { opacity: 1; }
+
+        .item-desc { flex: 1; padding-right: 15px; color: var(--text-main); }
+        
+        .item-keys {
+            color: var(--text-main); 
+            background: var(--key-bg);
+            border: 1px solid var(--border-dim);
+            padding: 4px 8px; border-radius: 4px;
+            font-weight: normal;
+            white-space: nowrap; font-size: 11px;
+            cursor: pointer;
+            transition: color 0.2s, border-color 0.2s;
+        }
+        
+        .item-keys:hover {
+            border-color: var(--current-color);
+            color: var(--current-color);
+        }
+
+        .setting-val { background: transparent; }
+
+        .fav {
+            background: none; border: none; color: var(--border-dim); cursor: pointer;
+            font-size: 15px; margin-left: 12px; line-height: 1;
+            transition: color 0.2s;
+            position: relative;
+            z-index: 2;
+        }
+        .fav:hover { color: var(--text-main); }
+        .fav.active { color: var(--current-color); }
+
+        /* ИНТЕРФЕЙС ЭКСПОРТА */
+        .dvr-ui { padding: 14px; font-family: inherit; }
+        .dvr-top { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border-dim); justify-content: center; }
+        .dvr-tabs { display: flex; gap: 8px; margin-bottom: 15px; }
+        .dvr-tab { flex: 1; text-align: center; padding: 6px 12px; cursor: pointer; color: var(--text-base); border: 1px solid var(--border-dim); border-radius: 4px; transition: all 0.2s; font-weight: bold; letter-spacing: 0.5px; }
+        .dvr-tab:hover { background: var(--item-hover); color: var(--text-main); }
+        .dvr-tab.active { border-color: var(--current-color); color: var(--current-color); background: var(--active-bg); }
+        .dvr-panel { display: none; }
+        .dvr-panel.active { display: block; }
+        .dvr-row { display: flex; align-items: center; margin-bottom: 10px; gap: 10px; }
+        .dvr-label { width: 100px; text-align: right; color: var(--text-base); }
+        .dvr-val { flex: 1; background: var(--key-bg); border: 1px solid var(--border-dim); padding: 5px 8px; border-radius: 4px; color: var(--text-main); cursor: text; display: flex; align-items: center; min-height: 24px; }
+        .dvr-val:hover { border-color: var(--current-color); }
+        .se-flex { display: flex; gap: 20px; }
+
+        .dvr-ctrl { display: flex; align-items: center; gap: 8px; color: var(--text-main); cursor: default; }
+        .dvr-ctrl input { appearance: none; -webkit-appearance: none; width: 14px; height: 14px; border: 1px solid var(--border-dim); background: var(--key-bg); outline: none; position: relative; display: flex; align-items: center; justify-content: center; margin: 0; transition: border-color 0.2s; }
+        .dvr-ctrl input[type="radio"] { border-radius: 50%; }
+        .dvr-ctrl input[type="checkbox"] { border-radius: 3px; }
+        .dvr-ctrl input:checked { border-color: var(--current-color); }
+        .dvr-ctrl input:checked::after { content: ''; position: absolute; background: var(--current-color); }
+        .dvr-ctrl input[type="radio"]:checked::after { width: 6px; height: 6px; border-radius: 50%; }
+        .dvr-ctrl input[type="checkbox"]:checked::after { width: 6px; height: 6px; border-radius: 1px; }
+        .dvr-ctrl.disabled { opacity: 0.5; }
+
+        /* --- МОБИЛЬНАЯ АДАПТАЦИЯ --- */
+        @media (max-width: 1024px) {
+            body { flex-direction: column; }
+            .sidebar { 
+                width: 100%; 
+                padding: 15px; 
+                border-right: none; 
+                border-bottom: 1px solid var(--border-dim); 
+                flex: none; 
+            }
+            .brand { justify-content: center; margin-bottom: 15px; }
+            .search-box { margin-bottom: 15px; padding: 0; }
+            .nav-list { 
+                flex-direction: row; 
+                overflow-x: auto; 
+                overflow-y: hidden; 
+                padding-bottom: 5px; 
+                margin-bottom: 0;
+            }
+            .nav-btn { flex: 0 0 auto; padding: 8px 14px; }
+            .sidebar-bottom {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                padding: 15px 0 0 0;
+                margin-top: 10px;
+                border-top: 1px solid var(--border-dim);
+            }
+            .theme-switch-wrapper { border: none; padding: 0; margin: 0; }
+            .author-credit { margin: 0; }
+            .main { padding: 15px; }
+            .header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .header-meta { text-align: left; }
+            
+            .grid { flex-direction: column; align-items: stretch; gap: 15px; }
+            .grid-col { width: 100%; }
+            .category { width: 100%; }
+            
+            .se-flex { flex-direction: column; gap: 15px; }
+            .dvr-top { flex-wrap: wrap; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="brand">SOFTWARE</div>
+        
+        <div class="search-box">
+            <input type="text" class="search-input" id="search-input" placeholder="Поиск..." oninput="handleSearch(this.value)">
+        </div>
+
+        <div class="nav-list" id="nav"></div>
+        
+        <div class="sidebar-bottom">
+            <div class="theme-switch-wrapper">
+                <div class="theme-label label-light" onclick="setTheme('light')">LIGHT</div>
+                <div class="theme-pill" onclick="toggleTheme()">
+                    <div class="theme-circle"></div>
+                </div>
+                <div class="theme-label label-dark" onclick="setTheme('dark')">DARK</div>
+            </div>
+            
+            <a href="https://t.me/titamedia" target="_blank" rel="noopener noreferrer" class="author-credit">
+                CREATED BY DMITRII TITAEV
+            </a>
+        </div>
+    </div>
+
+    <div class="main" id="main-area">
+        <div class="header" id="title"></div>
+        <div class="grid" id="grid"></div>
+    </div>
+
+<script>
+    const storage = {
+        get: function(key, defaultVal) {
+            try { 
+                var ls = window.localStorage;
+                return ls.getItem(key) || defaultVal; 
+            } catch(e) { return defaultVal; }
+        },
+        set: function(key, val) {
+            try { 
+                window.localStorage.setItem(key, val); 
+            } catch(e) {}
+        }
+    };
+
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        storage.set('kb_theme', theme);
+    }
+
+    function toggleTheme() {
+        const current = document.documentElement.getAttribute('data-theme');
+        setTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    const savedTheme = storage.get('kb_theme', 'dark');
+    setTheme(savedTheme);
+
+    function switchDvrTab(btn, tabClass) {
+        const ui = btn.closest('.dvr-ui');
+        ui.querySelectorAll('.dvr-tab').forEach(t => t.classList.remove('active'));
+        ui.querySelectorAll('.dvr-panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        ui.querySelector('.' + tabClass).classList.add('active');
+    }
+
+    const rawData = {
+        tg: { id: "tg", logo: "TG", title: "TELEGRAM", color: "#24a1de", meta: "НАСТРОЙКИ ЧАТОВ > СОЧЕТАНИЯ КЛАВИШ", data: [
+            ["Приложение", [
+                ["Закрытие окна", "Ctrl + W"],
+                ["Блокировка приложения", "Ctrl + L"],
+                ["Сворачивание окна", "Ctrl + M"],
+                ["Выход из приложения", "Ctrl + Q"],
+                ["Полноэкранный режим видео", "Ctrl + `"]
+            ]],
+            ["Навигация", [
+                ["Поиск сообщений", "Ctrl + F"],
+                ["Предыдущий чат", "Alt + Up"],
+                ["Следующий чат", "Alt + Down"],
+                ["Первый чат", "Ctrl + Alt + Home"],
+                ["Последний чат", "Ctrl + Alt + End"],
+                ["Список контактов", "Ctrl + J"],
+                ["Архив чатов", "Ctrl + 9"]
+            ]],
+            ["Папки", [
+                ["Избранное", "Ctrl + 0"],
+                ["Папка «Все чаты»", "Ctrl + 1"],
+                ["Папка №1", "Ctrl + 2"],
+                ["Папка №2", "Ctrl + 3"],
+                ["Папка №3", "Ctrl + 4"],
+                ["Папка №4", "Ctrl + 5"],
+                ["Папка №5", "Ctrl + 6"],
+                ["Папка №6", "Ctrl + 7"],
+                ["Последняя папка", "Ctrl + 8"],
+                ["Следующая папка", "Ctrl + Shift + Down"],
+                ["Предыдущая папка", "Ctrl + Shift + Up"]
+            ]],
+            ["Чат", [
+                ["Автопрочтение чата", "Ctrl + R"],
+                ["Запись голосового сообщения", "Ctrl + R"],
+                ["Просмотр меню чата", "Ctrl + \\"],
+                ["Предпросмотр чата", "Ctrl + ]"]
+            ]]
+        ]},
+        cb: { id: "cb", logo: "CB", title: "CENT BROWSER", color: "#1d4ed8", meta: "<a href='https://support.google.com/chrome/answer/157179?hl=ru' target='_blank'>OFFICIAL CHROME SHORTCUTS</a>", data: [
+            ["Вкладки и навигация", [
+                ["Новая вкладка", "Ctrl + T"],
+                ["Мультилогин вкладка справа", "Ctrl + M"],
+                ["На вкладку слева", "Ctrl + Shift + Tab"],
+                ["На вкладку справа", "Ctrl + Tab"],
+                ["Закрыть текущую вкладку", "Ctrl + W"],
+                ["Открыть закрытую вкладку", "Ctrl + Shift + T"],
+                ["Дублировать вкладку", "Alt + U"],
+                ["Закрепить / Открепить вкладку", "Alt + N"],
+                ["Вкл / Откл звук вкладки", "Alt + M"],
+                ["На первую вкладку", "Ctrl + 1"],
+                ["На последнюю вкладку", "Ctrl + 9"],
+                ["Последняя посещённая вкладка", "Alt + Z"],
+                ["Предыдущая страница", "Alt + Up"],
+                ["Следующая страница", "Alt + Down"],
+                ["Фокус на 1-м текстовом поле", "Ctrl + Shift + U"],
+                ["Назад", "Alt + Left"],
+                ["Вперед", "Alt + Right"]
+            ]],
+            ["Страница и данные", [
+                ["Перезагрузить", "F5"],
+                ["Жесткая перезагрузка", "Ctrl + F5"],
+                ["Обновить все вкладки", "Ctrl + Shift + F5"],
+                ["Очистка данных браузера", "Ctrl + Shift + Del"],
+                ["Копировать URL", "Alt + C"],
+                ["Копировать заголовок и адрес", "Alt + L"],
+                ["Открыть URL из буфера", "Alt + T"],
+                ["Текущий адрес в мультилогине", "Alt + Shift + O"],
+                ["Переключить просмотр курсора", "F7"],
+                ["Увеличить масштаб", "Ctrl + +"],
+                ["Уменьшить масштаб", "Ctrl + -"],
+                ["Сбросить масштаб", "Ctrl + 0"],
+                ["Перейти к адресной строке", "Alt + D"],
+                ["На главную страницу сайта", "Alt + O"],
+                ["В закладки", "Ctrl + D"]
+            ]],
+            ["Меню, инструменты и экспорт", [
+                ["Показать меню закладок", "Alt + B"],
+                ["Вкл / Выкл панель закладок", "Ctrl + Shift + B"],
+                ["Показать меню списка вкладок", "Alt + X"],
+                ["Открыть страницу в IE", "Ctrl + Shift + E"],
+                ["Отправить ссылку по e-mail", "Alt + Shift + E"],
+                ["Сохранить страницу как...", "Ctrl + S"],
+                ["Сохранить как изображение", "Alt + I"],
+                ["Скриншот всей страницы", "Alt + Shift + I"],
+                ["Создать ярлык", "Alt + Shift + S"],
+                ["Вкл / Откл звук в текущем процессе", "Alt + Shift + M"],
+                ["Закрыть браузер", "Ctrl + Shift + W"],
+                ["Выйти из браузера", "Ctrl + Shift + Q"],
+                ["Полноэкранный режим", "F11"]
+            ]],
+            ["Системные настройки и панели", [
+                ["Настройки", "Alt + S"],
+                ["Диспетчер закладок", "Ctrl + Shift + O"],
+                ["Загрузки", "Ctrl + J"],
+                ["История", "Ctrl + H"],
+                ["Главная страница", "Alt + Home"],
+                ["Перевести страницу", "Alt + Shift + T"],
+                ["В список для чтения", "Alt + Shift + R"],
+                ["Диспетчер задач", "Shift + Esc"],
+                ["Справочный центр", "F1"],
+                ["Инструменты разработчика", "Ctrl + Shift + I"],
+                ["Проверить элементы", "Ctrl + Shift + C"]
+            ]]
+        ]},
+        gd: { id: "gd", logo: "GD", title: "GOOGLE DOCS", color: "#1a73e8", meta: "<a href='https://support.google.com/docs/answer/179738?hl=ru' target='_blank'>OFFICIAL DOCS SHORTCUTS</a>", data: [
+            ["Общие действия", [
+                ["Копировать", "Ctrl + C"],
+                ["Вырезать", "Ctrl + X"],
+                ["Вставить", "Ctrl + V"],
+                ["Вставить без форматирования", "Ctrl + Shift + V"],
+                ["Отменить действие", "Ctrl + Z"],
+                ["Повторить действие", "Ctrl + Y / Ctrl + Shift + Z"],
+                ["Найти", "Ctrl + F"],
+                ["Найти и заменить", "Ctrl + H"],
+                ["Вставить / изменить ссылку", "Ctrl + K"],
+                ["Открыть ссылку", "Alt + Enter"],
+                ["Печать", "Ctrl + P"],
+                ["Открыть файл", "Ctrl + O"],
+                ["Сохранить", "Ctrl + S"],
+                ["Разрыв страницы", "Ctrl + Enter"],
+                ["Список всех быстрых клавиш", "Ctrl + /"],
+                ["Скрыть меню (компактный режим)", "Ctrl + Shift + F"]
+            ]],
+            ["Форматирование текста", [
+                ["Жирный", "Ctrl + B"],
+                ["Курсив", "Ctrl + I"],
+                ["Подчеркнутый", "Ctrl + U"],
+                ["Зачеркнутый", "Alt + Shift + 5"],
+                ["Надстрочный текст", "Ctrl + ."],
+                ["Подстрочный текст", "Ctrl + ,"],
+                ["Скопировать форматирование", "Ctrl + Alt + C"],
+                ["Вставить форматирование", "Ctrl + Alt + V"],
+                ["Очистить форматирование", "Ctrl + \\ / Ctrl + Space"],
+                ["Увеличить размер шрифта", "Ctrl + Shift + ."],
+                ["Уменьшить размер шрифта", "Ctrl + Shift + ,"]
+            ]],
+            ["Абзацы и заголовки", [
+                ["Обычный текст", "Ctrl + Alt + 0"],
+                ["Заголовок (уровни 1–6)", "Ctrl + Alt + 1-6"],
+                ["По левому краю", "Ctrl + Shift + L"],
+                ["По центру", "Ctrl + Shift + E"],
+                ["По правому краю", "Ctrl + Shift + R"],
+                ["По ширине", "Ctrl + Shift + J"],
+                ["Увеличить отступ", "Ctrl + ]"],
+                ["Уменьшить отступ", "Ctrl + ["],
+                ["Нумерованный список", "Ctrl + Shift + 7"],
+                ["Маркированный список", "Ctrl + Shift + 8"],
+                ["Список задач (чек-лист)", "Ctrl + Shift + 9"],
+                ["Переместить абзац", "Ctrl + Shift + Up/Down"]
+            ]],
+            ["Изображения и комментарии", [
+                ["Добавить комментарий", "Ctrl + Alt + M"],
+                ["Добавить Alt text", "Ctrl + Alt + Y"],
+                ["Увеличить размер картинки", "Ctrl + Alt + K"],
+                ["Уменьшить размер картинки", "Ctrl + Alt + J"]
+            ]]
+        ]},
+        gs: { id: "gs", logo: "GS", title: "GOOGLE SHEETS", color: "#0f9d58", meta: "<a href='https://support.google.com/docs/answer/181110?hl=ru' target='_blank'>OFFICIAL SHEETS SHORTCUTS</a>", data: [
+            ["Общие действия и навигация", [
+                ["Копировать", "Ctrl + C"],
+                ["Вырезать", "Ctrl + X"],
+                ["Вставить", "Ctrl + V"],
+                ["Вставить значения", "Ctrl + Shift + V"],
+                ["Отменить", "Ctrl + Z"],
+                ["Повторить", "Ctrl + Y"],
+                ["Найти", "Ctrl + F"],
+                ["Заменить", "Ctrl + H"],
+                ["Край данных", "Ctrl + Arrows"],
+                ["Выделить массив", "Ctrl + Shift + Arrows"],
+                ["Список шорткатов", "Ctrl + /"],
+                ["Поиск по меню", "Alt + /"],
+                ["Скрыть меню", "Ctrl + Shift + F"]
+            ]],
+            ["Строки, столбцы и листы", [
+                ["Выделить столбец", "Ctrl + Space"],
+                ["Выделить строку", "Shift + Space"],
+                ["Выделить всё", "Ctrl + A"],
+                ["Добавить строку/столбец", "Ctrl + Alt + ="],
+                ["Удалить строку/столбец", "Ctrl + Alt + -"],
+                ["Скрыть строку", "Ctrl + Alt + 9"],
+                ["Скрыть столбец", "Ctrl + Alt + 0"],
+                ["Новый лист", "Shift + F11"],
+                ["Следующий лист", "Alt + Down"],
+                ["Предыдущий лист", "Alt + Up"]
+            ]],
+            ["Данные и формулы", [
+                ["Заполнить диапазон", "Ctrl + Enter"],
+                ["Скопировать сверху", "Ctrl + D"],
+                ["Скопировать слева", "Ctrl + R"],
+                ["Текущая дата", "Ctrl + ;"],
+                ["Текущее время", "Ctrl + Shift + ;"],
+                ["Вставить ссылку", "Ctrl + K"],
+                ["Перенос строки", "Alt + Enter"],
+                ["Абсолютная ссылка / Повтор", "F4"]
+            ]],
+            ["Форматирование ячеек", [
+                ["Жирный", "Ctrl + B"],
+                ["Курсив", "Ctrl + I"],
+                ["Подчеркнутый", "Ctrl + U"],
+                ["Зачеркнутый", "Alt + Shift + 5"],
+                ["Влево", "Ctrl + Shift + L"],
+                ["По центру", "Ctrl + Shift + E"],
+                ["Вправо", "Ctrl + Shift + R"],
+                ["Сбросить формат", "Ctrl + \\"]
+            ]],
+            ["Форматы чисел", [
+                ["Десятичный", "Ctrl + Shift + 1"],
+                ["Время", "Ctrl + Shift + 2"],
+                ["Дата", "Ctrl + Shift + 3"],
+                ["Валюта", "Ctrl + Shift + 4"],
+                ["Проценты", "Ctrl + Shift + 5"]
+            ]]
+        ]},
+        np: { id: "np", logo: "NP", title: "NOTEPAD", color: "#15803d", meta: "ОПЦИИ > КЛАВИШИ БЫСТРОГО ДОСТУПА", data: [
+            ["Файл", [
+                ["Новый файл", "Ctrl + N"],
+                ["Открыть файл", "Ctrl + O"],
+                ["Сохранить", "Ctrl + S"],
+                ["Сохранить как", "Ctrl + Alt + S"],
+                ["Сохранить все", "Ctrl + Shift + S"],
+                ["Закрыть вкладку", "Ctrl + W"],
+                ["Закрыть все вкладки", "Ctrl + Shift + W"],
+                ["Печать", "Ctrl + P"]
+            ]],
+            ["Правка", [
+                ["Отменить", "Ctrl + Z"],
+                ["Повторить", "Ctrl + Y"],
+                ["Вырезать", "Ctrl + X"],
+                ["Копировать", "Ctrl + C"],
+                ["Вставить", "Ctrl + V"],
+                ["Дублировать строку", "Ctrl + D"],
+                ["Вырезать строку", "Ctrl + L"],
+                ["Удалить строку", "Ctrl + Shift + L"],
+                ["Поменять с предыдущей", "Ctrl + T"],
+                ["Переместить строку вверх/вниз", "Ctrl + Shift + Up/Down"],
+                ["Нижний регистр", "Ctrl + U"],
+                ["Верхний регистр", "Ctrl + Shift + U"],
+                ["Комментировать строку", "Ctrl + Q"],
+                ["Блочное комментирование", "Ctrl + Shift + Q"]
+            ]],
+            ["Поиск", [
+                ["Найти", "Ctrl + F"],
+                ["Найти и заменить", "Ctrl + H"],
+                ["Найти в файлах", "Ctrl + Shift + F"],
+                ["Найти далее", "F3"],
+                ["Найти предыдущее", "Shift + F3"],
+                ["Поиск выделенного (вперед)", "Ctrl + F3"],
+                ["Поиск выделенного (назад)", "Ctrl + Shift + F3"],
+                ["Перейти к строке", "Ctrl + G"]
+            ]],
+            ["Вид и навигация", [
+                ["Полноэкранный режим", "F11"],
+                ["Масштаб (+ / -)", "Ctrl + Scroll"],
+                ["Сбросить масштаб", "Ctrl + Num /"],
+                ["Следующая вкладка", "Ctrl + Tab / PgDn"],
+                ["Предыдущая вкладка", "Ctrl + Shift + Tab / PgUp"],
+                ["Свернуть все блоки", "Alt + 0"],
+                ["Развернуть все блоки", "Alt + Shift + 0"],
+                ["Свернуть текущий уровень", "Ctrl + Alt + F"],
+                ["Развернуть текущий уровень", "Ctrl + Alt + Shift + F"]
+            ]],
+            ["Макросы", [
+                ["Запись макроса (Старт/Стоп)", "Ctrl + Shift + R"],
+                ["Воспроизвести макрос", "Ctrl + Shift + P"]
+            ]]
+        ]},
+        wn: { id: "wn", logo: "WN", title: "WINDOWS", color: "#0369a1", meta: "<a href='https://support.microsoft.com/ru-ru/windows/%D1%81%D0%BE%D1%87%D0%B5%D1%82%D0%B0%D0%BD%D0%B8%D1%8F-%D0%BA%D0%BB%D0%B0%D0%B2%D0%B8%D1%88-%D0%B2-windows-dcc61a57-8ff0-cffe-9796-cb9706c75eec' target='_blank'>OFFICIAL WINDOWS SHORTCUTS</a>", data: [
+            ["Система и интерфейс", [
+                ["Эмодзи и спецсимволы", "Win + . / ;"],
+                ["История буфера обмена", "Win + V"],
+                ["Скриншот области", "Win + Shift + S"],
+                ["Меню профи / Сисадмина", "Win + X"],
+                ["Окно «Выполнить»", "Win + R"],
+                ["Диспетчер задач", "Ctrl + Shift + Esc"],
+                ["Настройки системы", "Win + I"],
+                ["Блокировка учетной записи", "Win + L"],
+                ["Центр уведомлений", "Win + A"],
+                ["Меню проекции (мониторы)", "Win + P"]
+            ]],
+            ["Окна и рабочее пространство", [
+                ["Свернуть всё (Рабочий стол)", "Win + D"],
+                ["Свернуть всё, кроме активного", "Win + Home"],
+                ["Прилепить окно к краю", "Win + Arrows"],
+                ["Переключение окон", "Alt + Tab"],
+                ["Представление задач", "Win + Tab"],
+                ["Закрыть программу", "Alt + F4"],
+                ["Программы на панели задач", "Win + 1 - 9"]
+            ]],
+            ["Виртуальные рабочие столы", [
+                ["Создать новый стол", "Win + Ctrl + D"],
+                ["Переключение между столами", "Win + Ctrl + Left/Right"],
+                ["Закрыть текущий стол", "Win + Ctrl + F4"]
+            ]],
+            ["Проводник", [
+                ["Открыть Проводник", "Win + E"],
+                ["Выделить адресную строку", "Alt + D / Ctrl + L"],
+                ["Создать новую папку", "Ctrl + Shift + N"],
+                ["Переименовать", "F2"],
+                ["Удалить безвозвратно", "Shift + Delete"],
+                ["Свойства файла/папки", "Alt + Enter"],
+                ["Область предпросмотра", "Alt + P"],
+                ["Панель сведений", "Alt + Shift + P"]
+            ]]
+        ]},
+        tc: { id: "tc", logo: "TC", title: "COMMANDER", color: "#3730a3", meta: "МЕНЮ СПРАВКА > ГОРЯЧИЕ КЛАВИШИ", data: [
+            ["Файловые операции", [
+                ["Справка", "F1"], ["Обновить панель", "F2"], ["Просмотр (Lister)", "F3"], ["Редактировать", "F4"], ["Копировать", "F5"], ["Переименовать / Переместить", "F6"], ["Создать каталог", "F7"], ["Удалить", "F8 / Del"], ["Верхнее меню", "F9"], ["Выйти из меню", "F10"]
+            ]],
+            ["Навигация и диски", [
+                ["Переключить панель", "Tab"], ["Диск слева", "Alt + F1"], ["Диск справа", "Alt + F2"], ["Избранные каталоги", "Ctrl + D"], ["История каталогов", "Alt + Down"], ["На уровень вверх", "Backspace / Ctrl + PgUp"], ["В корневой каталог", "Ctrl + \\"]
+            ]],
+            ["Работа с вкладками", [
+                ["Новая вкладка", "Ctrl + T"], ["Каталог в новой вкладке", "Ctrl + Up"], ["Закрыть вкладку", "Ctrl + W"], ["Закрыть все вкладки", "Ctrl + Shift + W"], ["Вкладка вперед/назад", "Ctrl + Tab / Shift + Tab"]
+            ]],
+            ["Выделение файлов", [
+                ["Выделить / Снять (со сдвигом)", "Insert / Space"], ["Выделить по маске", "Num +"], ["Снять выделение по маске", "Num -"], ["Инвертировать выделение", "Num *"], ["Выделить всё", "Ctrl + A / Ctrl + Num +"], ["Снять выделение со всех", "Ctrl + Num -"], ["Выделить с тем же расширением", "Alt + Num +"]
+            ]],
+            ["Архивы", [
+                ["Упаковать в архив", "Alt + F5"], ["Распаковать архив", "Alt + F9 / Alt + F6"], ["Проверить архив", "Alt + Shift + F9"]
+            ]],
+            ["Специальные команды", [
+                ["Новый текстовый файл", "Shift + F4"], ["Переименовать на месте", "Shift + F6"], ["Групповое переименование", "Ctrl + M"], ["Плоский список (все файлы)", "Ctrl + B"], ["Быстрый просмотр во 2-й панели", "Ctrl + Q"], ["Подсчитать объем", "Ctrl + L"], ["Поиск файлов", "Ctrl + F / Alt + F7"]
+            ]]
+        ]},
+        pr: { id: "pr", logo: "PR", title: "PREMIERE", color: "#4f46e5", meta: "<a href='https://helpx.adobe.com/ru/premiere/desktop/get-started/keyboard-shortcuts/default-keyboard-shortcuts.html' target='_blank'>OFFICIAL PREMIERE SHORTCUTS</a>", data: [
+            ["Файл и Проект", [
+                ["Импорт файлов", "Ctrl + I"],
+                ["Экспорт медиа", "Ctrl + M"],
+                ["Сохранить проект", "Ctrl + S"],
+                ["Сохранить как...", "Ctrl + Shift + S"],
+                ["Рендер эффектов (In to Out)", "Enter"]
+            ]],
+            ["Окна и Панели", [
+                ["Развернуть панель под курсором", "~"],
+                ["Плавающее окно панели", "Ctrl + Drag"],
+                ["Окно проекта (Project)", "Shift + 1"],
+                ["Исходник (Source)", "Shift + 2"],
+                ["Таймлайн (Timeline)", "Shift + 3"],
+                ["Окно просмотра (Program)", "Shift + 4"],
+                ["Элементы управления (Effect Controls)", "Shift + 5"],
+                ["Аудиомикшер (Audio Mixer)", "Shift + 6"]
+            ]],
+            ["Навигация и Зум", [
+                ["Назад / Пауза / Вперед", "J / K / L"],
+                ["Воспроизведение / Пауза", "Space"],
+                ["Прыжок по склейкам", "Up / Down"],
+                ["Масштаб таймлайна (горизонталь)", "+ / -"],
+                ["Масштаб видео (высота)", "Ctrl + +/-"],
+                ["Масштаб аудио (высота)", "Alt + +/-"],
+                ["Масштаб всех дорожек", "Shift + +/-"],
+                ["Выкл предпросмотр аудио (Scrub)", "Shift + H"]
+            ]],
+            ["Инструменты", [
+                ["Обычный курсор (Selection)", "V"],
+                ["Выделить всё справа (Track Select)", "A"],
+                ["Лезвие (Razor)", "C"],
+                ["Растягивание по скорости", "R"],
+                ["Прокрутка клипа (Slip)", "Y"],
+                ["Смещение клипа (Slide)", "U"],
+                ["Перо (Pen)", "P"],
+                ["Текст (Type)", "T"]
+            ]],
+            ["Монтаж и Тримминг", [
+                ["Срезать всё слева до плейхеда", "Q"],
+                ["Срезать всё справа от плейхеда", "W"],
+                ["Разрезать клип (Add Edit)", "Ctrl + K"],
+                ["Разрезать все дорожки", "Ctrl + Shift + K"],
+                ["Удалить со сдвигом (Ripple Delete)", "Shift + Delete"],
+                ["Удалить клип (Clear)", "Delete"],
+                ["Вставка поверх (Overwrite)", "."],
+                ["Вставка со сдвигом (Insert)", ","],
+                ["Вырезать (Lift - оставить пустоту)", ";"],
+                ["Извлечь (Extract - схлопнуть пустоту)", "'"],
+                ["Вставить поверх (Paste)", "Ctrl + V"],
+                ["Вставить со сдвигом (Paste Insert)", "Ctrl + Shift + V"],
+                ["Найти кадр в исходнике (Match Frame)", "F"],
+                ["Найти кадр на таймлайне (Rev. Match)", "Shift + R"],
+                ["Вкл / Выкл клип (Enable)", "Shift + E"],
+                ["Выделить только видео или звук", "Alt + Клик"],
+                ["Выделить клип под плейхедом", "D"],
+                ["Выделить ближайшую склейку", "Shift + T"],
+                ["Сменить тип подрезки (Trim Type)", "Ctrl + Shift + T"]
+            ]],
+            ["Точные сдвиги (Nudging)", [
+                ["Сдвинуть клип на 1 кадр", "Alt + Left/Right"],
+                ["Сдвинуть клип на 5 кадров", "Alt + Shift + Left/Right"],
+                ["Сдвинуть склейку на 1 кадр", "Ctrl + Left/Right"],
+                ["Сдвинуть склейку на 5 кадров", "Ctrl + Shift + Left/Right"],
+                ["Скольжение клипа (Slide)", "Alt + , / ."]
+            ]],
+            ["Метки и Маркеры", [
+                ["Точка входа / Точка выхода", "I / O"],
+                ["In/Out по краям клипа", "X"],
+                ["Сбросить метки In и Out", "Ctrl + Shift + X"],
+                ["Поставить маркер", "M"]
+            ]],
+            ["Работа со звуком", [
+                ["Меню усиления звука (Audio Gain)", "G"],
+                ["Громкость +1dB / -1dB", "] / ["],
+                ["Громкость +6dB / -6dB", "Shift + ] / ["]
+            ]],
+            ["Атрибуты и Утилиты", [
+                ["Отменить действие", "Ctrl + Z"],
+                ["Сбросить все эффекты", "ПКМ -> Remove Attributes"],
+                ["Вставить атрибуты", "Ctrl + Alt + V"],
+                ["Скрытое меню языка (Debug)", "Ctrl + F12"],
+                ["Открыть секвенцию мультикама", "Ctrl + Клик"]
+            ]]
+        ]},
+        da: { id: "da", logo: "DR", title: "DAVINCI RESOLVE", color: "#c2410c", meta: "DAVINCI RESOLVE > KEYBOARD CUSTOMIZATION", data: [
+            ["Интерфейс и Навигация", [
+                ["Настройки пользователя", "Ctrl + ,"],
+                ["Настройки проекта", "Shift + 9"],
+                ["Вкладка Media", "Shift + 2"],
+                ["Вкладка Edit", "Shift + 4"],
+                ["Вкладка Fusion", "Shift + 5"],
+                ["Вкладка Color", "Shift + 6"],
+                ["Вкладка Fairlight", "Shift + 7"],
+                ["Вкладка Deliver", "Shift + 8"]
+            ]],
+            ["Вкладка EDIT: Монтаж", [
+                ["Обычный курсор", "A"],
+                ["Лезвие (Blade)", "B"],
+                ["Выделить вперед (текущая)", "Y"],
+                ["Выделить вперед (все дорожки)", "Alt + Y"],
+                ["Выделить назад (текущая)", "Ctrl + Y"],
+                ["Выделить назад (все дорожки)", "Ctrl + Alt + Y"],
+                ["Разрезать клип", "Ctrl + \\ / Ctrl + B"],
+                ["Связь видео и звука", "Ctrl + Shift + L"],
+                ["Вставить клип (Insert)", "F9"],
+                ["Перезаписать (Overwrite)", "F10"],
+                ["Заменить клип (Replace)", "F11"],
+                ["Положить на верхнюю дорожку", "F12"],
+                ["Вставить в конец (Append)", "Shift + F12"],
+                ["Вставить атрибуты", "Alt + V"]
+            ]],
+            ["Вкладка EDIT: Тримминг", [
+                ["Удалить (оставить дырку)", "Backspace"],
+                ["Удалить со сдвигом", "Shift + Backspace / Del"],
+                ["Срезать слева до плейхеда", "Ctrl + Shift + ["],
+                ["Срезать справа до плейхеда", "Ctrl + Shift + ]"],
+                ["Сдвинуть клип на 1 кадр", ", / ."],
+                ["Изменение скорости (Retime)", "Ctrl + R"],
+                ["Добавить переход", "Ctrl + T"]
+            ]],
+            ["Вкладка COLOR", [
+                ["Добавить Serial Node", "Alt + S"],
+                ["Добавить Serial Before", "Shift + S"],
+                ["Добавить Parallel Node", "Alt + P"],
+                ["Добавить Layer Node", "Alt + L"],
+                ["Добавить Outside Node", "Alt + O"],
+                ["Вкл/Выкл одну ноду", "Ctrl + D"],
+                ["Вкл/Выкл весь грейд", "Alt + D"],
+                ["Сбросить одну ноду", "Shift + Home"],
+                ["Сбросить все ноды", "Ctrl + Home"],
+                ["Кино-режим (Cinema Viewer)", "Ctrl + F / P"],
+                ["Расширенный экран", "Alt + F"],
+                ["Сравнение До/После (Wipe)", "Ctrl + W"],
+                ["Трекинг маски вперёд", "Ctrl + T"]
+            ]],
+            ["Вкладка FUSION", [
+                ["Меню выбора инструментов", "Shift + Space"],
+                ["Вывод ноды на экран 1/2", "1 / 2"],
+                ["Отключить ноду (Pass Through)", "Ctrl + P"]
+            ]],
+            ["Метки и Масштаб", [
+                ["Точка Входа / Выхода", "I / O"],
+                ["Снять выделение In/Out", "Alt + X"],
+                ["Поставить маркер", "M"],
+                ["Уместить таймлайн (Zoom to Fit)", "Shift + Z"],
+                ["Масштаб таймлайна (+ / -)", "Ctrl + = / Ctrl + -"]
+            ]]
+        ]},
+        cc: { id: "cc", logo: "CC", title: "CAPCUT", color: "#475569", meta: "КНОПКА SHORTCUT В ВЕРХНЕЙ ПАНЕЛИ", data: [
+            ["Файл и Базовые", [
+                ["Новый проект", "Ctrl + N"],
+                ["Импорт медиаматериалов", "Ctrl + I"],
+                ["Экспорт", "Ctrl + E"],
+                ["Отмена", "Ctrl + Z"],
+                ["Сброс", "Ctrl + Shift + Z"],
+                ["Копия", "Ctrl + C"],
+                ["Обрезка (Вырезать)", "Ctrl + X"],
+                ["Вставить", "Ctrl + V"],
+                ["Копировать параметры", "Ctrl + Shift + C"],
+                ["Вставить атрибуты", "Ctrl + Shift + V"],
+                ["Удалить", "Backspace"],
+                ["Переключить панель материалов", "Tab"],
+                ["Обратно к редактированию", "Ctrl + Alt + Q"],
+                ["Выйти", "Ctrl + Q"]
+            ]],
+            ["Плеер и Интерфейс", [
+                ["Воспр./пауза", "Space"],
+                ["На весь экран", "Ctrl + F"],
+                ["Вкл./выкл. полноэкранный режим", "Ctrl + Shift + F"],
+                ["Выкл. полноэкранный режим", "Esc"],
+                ["Приблизить плеер", "Alt + Shift + +"],
+                ["Отдалить плеер", "Alt + Shift + -"],
+                ["Масштаб по окну плеера", "Alt + Shift + Z"],
+                ["Показать/скрыть линейки", "Ctrl + Alt + R"],
+                ["Показать/скрыть направляющие", "Ctrl + ;"],
+                ["Отменить сопоставление в плеере", "Hold Ctrl"]
+            ]],
+            ["Таймлайн и Навигация", [
+                ["Приблизить", "+"],
+                ["Отдалить", "-"],
+                ["Сдвиг вправо", "L"],
+                ["Остановка сдвига", "K"],
+                ["Выбрать все слева", "["],
+                ["Выбрать все справа", "]"],
+                ["Магнит на основной дорожке", "P"],
+                ["Автоматическое склеивание", "N"],
+                ["Активация привязки", "~"]
+            ]],
+            ["Монтаж и Тримминг", [
+                ["Выберите режим (Курсор)", "A"],
+                ["Режим разделения (Лезвие)", "B"],
+                ["Разделение", "S"],
+                ["Разделить все", "Ctrl + Shift + B"],
+                ["Удалить контент слева", "Q"],
+                ["Удалить контент справа", "W"]
+            ]],
+            ["Ключевые кадры", [
+                ["Показать/скрыть панель", "Alt + K"],
+                ["Добавить ключ (на панель)", "Shift + Клик"],
+                ["Добавить ключевой кадр", "Shift + Alt + K"],
+                ["Изменение размера с сохр. расположения", "Alt + Drag"]
+            ]]
+        ]},
+        au: { id: "au", logo: "AU", title: "AUDITION", color: "#0f766e", meta: "<a href='https://helpx.adobe.com/ru/audition/using/default-keyboard-shortcuts.html' target='_blank'>OFFICIAL AUDITION SHORTCUTS</a>", data: [
+            ["Навигация и Зум", [
+                ["Waveform / Multitrack (Тумблер)", "1"],
+                ["Включить Waveform", "9"],
+                ["Включить Multitrack", "0"],
+                ["Возврат плейхеда при остановке", "Shift + X"],
+                ["Масштаб по горизонтали", "= / -"],
+                ["Масштаб по вертикали", "Alt + = / -"],
+                ["Уместить проект на экране", "\\"],
+                ["К началу / концу проекта", "Home / End"]
+            ]],
+            ["Инструменты", [
+                ["Выделение времени (Time)", "T"],
+                ["Перемещение (Move)", "V"],
+                ["Лезвие (Razor)", "R"],
+                ["Прокрутка клипа (Slip)", "Y"],
+                ["Восстанавливающая кисть (Spot Heal)", "A"],
+                ["Выделение области (Marquee)", "E"],
+                ["Кисть (Paintbrush)", "B"]
+            ]],
+            ["Воспроизведение и Маркеры", [
+                ["Воспроизведение / Пауза", "Space"],
+                ["Плей от выделения до конца", "Shift + Space"],
+                ["Запись со вставкой (Punch and Roll)", "Shift + Alt + Space"],
+                ["Поставить маркер", "M / *"],
+                ["Прыжок по маркерам / склейкам", "Ctrl + Left/Right"],
+                ["Вкл/Выкл привязку (Snapping)", "S"]
+            ]],
+            ["Редактирование и Эффекты", [
+                ["Захват профиля шума (Noise Print)", "Shift + P"],
+                ["Повтор эффекта с настройками", "Shift + R"],
+                ["Повтор эффекта (Применить сразу)", "Ctrl + R"],
+                ["Авто-восстановление (Auto-Heal)", "Ctrl + U"],
+                ["Вставить в новый файл (Paste to New)", "Alt + Shift + V"],
+                ["Вставить с микшированием (Mix Paste)", "Ctrl + Shift + V"],
+                ["Вставить тишину", "Shift + Delete"],
+                ["Показать спектрограмму (Spectral)", "Shift + D"]
+            ]],
+            ["Мультитрек и Сведение", [
+                ["Разрезать клип под плейхедом", "Ctrl + K"],
+                ["Сдвинуть клип влево / вправо", "Alt + , / ."],
+                ["Перекинуть клип на трек выше / ниже", "Alt + Up/Down"],
+                ["Группировка клипов", "Ctrl + G / Ctrl + Shift + G"],
+                ["Вкл/Откл Mute/Solo на всех", "Ctrl + Shift + Клик"],
+                ["Плавное изменение крутилок", "Ctrl + Drag"],
+                ["Крупное изменение крутилок", "Shift + Drag"]
+            ]]
+        ]},
+        ae: { id: "ae", logo: "AE", title: "AFTER EFFECTS", color: "#c084fc", meta: "<a href='https://helpx.adobe.com/ru/after-effects/using/keyboard-shortcuts-reference.html' target='_blank'>OFFICIAL AFTER EFFECTS SHORTCUTS</a>", data: [
+            ["Вызов свойств слоя", [
+                ["Position (Позиция)", "P"],
+                ["Scale (Масштаб)", "S"],
+                ["Rotation (Вращение)", "R"],
+                ["Opacity (Непрозрачность)", "T"],
+                ["Anchor Point (Якорная точка)", "A"],
+                ["Свойства с ключами (Ключи)", "U"],
+                ["Все измененные свойства", "U U"],
+                ["Эффекты", "E"],
+                ["Форма маски (Mask Path)", "M"],
+                ["Все свойства маски", "M M"],
+                ["Растушевка маски (Feather)", "F"],
+                ["Выражения (Expressions)", "E E"],
+                ["Уровень звука (Audio Levels)", "L"],
+                ["Волна звука (Audio Waveform)", "L L"],
+                ["Добавить свойство к открытым", "Shift + Кнопка"]
+            ]],
+            ["Манипуляции со слоями", [
+                ["Разрезать слой по плейхеду", "Ctrl + Shift + D"],
+                ["Обрезать слой слева", "Alt + ["],
+                ["Обрезать слой справа", "Alt + ]"],
+                ["Сдвинуть начало к плейхеду", "["],
+                ["Сдвинуть конец к плейхеду", "]"],
+                ["Сдвинуть слой на 1 кадр", "Alt + PgUp/PgDn"],
+                ["Сдвинуть слой на 10 кадров", "Alt + Shift + PgUp/Dn"],
+                ["Поднять/опустить в иерархии", "Ctrl + [ / ]"],
+                ["Переместить в самый верх/низ", "Ctrl + Shift + [ / ]"],
+                ["Дублировать слой", "Ctrl + D"],
+                ["Прекомпоз (Pre-compose)", "Ctrl + Shift + C"],
+                ["Заменить слой из окна Project", "Alt + Drag"]
+            ]],
+            ["Навигация и Таймлайн", [
+                ["К началу/концу слоя", "I / O"],
+                ["К пред./след. ключу", "J / K"],
+                ["Шаг на 1 кадр", "PgDn / PgUp"],
+                ["Шаг на 10 кадров", "Shift + PgDn/PgUp"],
+                ["Начало рабочей области", "B"],
+                ["Конец рабочей области", "N"],
+                ["Центрировать по плейхеду", "D"],
+                ["Перейти к времени", "Alt + Shift + J"],
+                ["Маркер на слой", "Num *"],
+                ["Маркер с окном настроек", "Alt + Num *"],
+                ["Масштаб до кадров (Zoom)", ";"],
+                ["Поиск по таймлайну", "Ctrl + F"]
+            ]],
+            ["Ключевые кадры и Анимация", [
+                ["Плавный старт/стоп (Easy Ease)", "F9"],
+                ["Плавный вход (Ease In)", "Shift + F9"],
+                ["Плавный выход (Ease Out)", "Ctrl + Shift + F9"],
+                ["Редактор графиков (Graph Editor)", "Shift + F3"],
+                ["Добавить выражение", "Alt + Клик по часам"],
+                ["Интерполяция ключей", "Ctrl + Alt + K"],
+                ["Копировать с сохранением связей", "Ctrl + Alt + C"]
+            ]],
+            ["Инструменты", [
+                ["Курсор (Selection)", "V"],
+                ["Рука (Hand Tool)", "H / Space"],
+                ["Вращение (Rotation)", "W"],
+                ["Якорная точка (Pan Behind)", "Y"],
+                ["Шейпы и Маски", "Q"],
+                ["Перо (Pen Tool)", "G"],
+                ["Камера (Camera Tool)", "C"],
+                ["Текст (Type Tool)", "Ctrl + T"],
+                ["Кисть ротоскопинга (Roto)", "Alt + W"],
+                ["Марионеточная деформация", "Ctrl + P"]
+            ]],
+            ["Центрирование и Подгонка", [
+                ["Якорную точку в центр слоя", "Ctrl + Alt + Home"],
+                ["Слой в центр композиции", "Ctrl + Home"],
+                ["Подогнать слой под размер", "Ctrl + Alt + F"],
+                ["Подогнать под ширину", "Ctrl + Alt + Shift + H"],
+                ["Подогнать под высоту", "Ctrl + Alt + Shift + G"]
+            ]],
+            ["Интерфейс и Рендер", [
+                ["Настройки композиции", "Ctrl + K"],
+                ["Скрыть всё, оставить предпросмотр", "Ctrl + \\"],
+                ["Панель на весь экран", "~"],
+                ["Блокировка рендера (Refresh)", "Caps Lock"],
+                ["RAM Preview", "Num 0"],
+                ["Очистить кэш (Purge All)", "Ctrl + Alt + Num 0"],
+                ["Добавить в очередь рендера", "Ctrl + M"],
+                ["Добавить в Media Encoder", "Ctrl + Alt + M"],
+                ["Сохранить текущий кадр", "Ctrl + Alt + S"],
+                ["Мини-схема (Mini Flowchart)", "Tab"]
+            ]]
+        ]},
+        ps: { id: "ps", logo: "PS", title: "PHOTOSHOP", color: "#38bdf8", meta: "<a href='https://helpx.adobe.com/ru/photoshop/desktop/get-started/settings-and-preferences/view-keyboard-shortcuts.html' target='_blank'>OFFICIAL PHOTOSHOP SHORTCUTS</a>", data: [
+            ["Инструменты", [
+                ["Перемещение (Move)", "V"],
+                ["Прямоугольная / Овальная область", "M"],
+                ["Лассо (Lasso)", "L"],
+                ["Быстрое выделение / Волшебная палочка", "W"],
+                ["Рамка / Кадрирование (Crop)", "C"],
+                ["Пипетка (Eyedropper)", "I"],
+                ["Восстанавливающая кисть / Заплатка", "J"],
+                ["Кисть / Карандаш (Brush)", "B"],
+                ["Штамп (Clone Stamp)", "S"],
+                ["Архивная кисть (History)", "Y"],
+                ["Ластик (Eraser)", "E"],
+                ["Градиент / Заливка (Gradient)", "G"],
+                ["Осветлитель / Затемнитель", "O"],
+                ["Перо (Pen)", "P"],
+                ["Текст (Type)", "T"],
+                ["Выделение контура (Path)", "A"],
+                ["Фигуры (Shapes)", "U"],
+                ["Рука (Hand)", "H / Space"],
+                ["Поворот вида (Rotate View)", "R"],
+                ["Переключение внутри группы инстр.", "Shift + Буква"]
+            ]],
+            ["Слои (Layers)", [
+                ["Новый пустой слой", "Ctrl + Shift + N"],
+                ["Новый слой без всплывающего окна", "Ctrl + Alt + Shift + N"],
+                ["Дублировать слой / Скопировать выделение", "Ctrl + J"],
+                ["Вырезать выделение на новый слой", "Ctrl + Shift + J"],
+                ["Сгруппировать выделенные слои", "Ctrl + G"],
+                ["Разгруппировать", "Ctrl + Shift + G"],
+                ["Объединить выделенные слои", "Ctrl + E"],
+                ["Объединить видимые слои", "Ctrl + Shift + E"],
+                ["Слить видимые в один новый (Stamp)", "Ctrl + Alt + Shift + E"],
+                ["Переместить слой вверх / вниз", "Ctrl + [ / ]"],
+                ["Переместить слой в самый верх / низ", "Ctrl + Shift + [ / ]"],
+                ["Выбрать слой выше / ниже", "Alt + [ / ]"],
+                ["Добавить слой к выделению", "Alt + Shift + [ / ]"],
+                ["Обтравочная маска (Clipping Mask)", "Ctrl + Alt + G / Alt + Клик"],
+                ["Непрозрачность (Opacity)", "1 - 0"],
+                ["Заливка (Fill)", "Shift + 1 - 0"],
+                ["Перебор режимов наложения", "Shift + +/-"]
+            ]],
+            ["Выделение и Маски", [
+                ["Выделить всё", "Ctrl + A"],
+                ["Снять выделение", "Ctrl + D"],
+                ["Вернуть снятое выделение", "Ctrl + Shift + D"],
+                ["Инвертировать выделение", "Ctrl + Shift + I"],
+                ["Растушевка (Feather)", "Shift + F6"],
+                ["Выделить пиксели слоя", "Ctrl + Клик по иконке"],
+                ["Режим быстрой маски", "Q"],
+                ["Посмотреть только маску (ч/б режим)", "Alt + Клик по маске"],
+                ["Включить/Отключить маску слоя", "Shift + Клик по маске"]
+            ]],
+            ["Кисти и Цвета", [
+                ["Изменить размер кисти", "[ / ]"],
+                ["Изменить жесткость кисти", "Shift + [ / ]"],
+                ["Размер и жесткость мышью", "Alt + ПКМ + Drag"],
+                ["Сбросить цвета на черный и белый", "D"],
+                ["Поменять цвета местами", "X"],
+                ["Залить цветом переднего плана", "Alt + Backspace"],
+                ["Залить цветом заднего плана", "Ctrl + Backspace"],
+                ["Залить с сохранением прозрачности", "Shift + Alt + Backspace"]
+            ]],
+            ["Трансформирование", [
+                ["Свободное трансформирование", "Ctrl + T"],
+                ["Трансформирование с копированием", "Ctrl + Alt + T"],
+                ["Повторить последнее действие", "Ctrl + Shift + T"],
+                ["Повторить с созданием копий", "Ctrl + Alt + Shift + T"],
+                ["Искажение (Distort)", "Ctrl + Тянуть за угол"],
+                ["Симметричное искажение (Perspective)", "Ctrl + Alt + Shift + Угол"]
+            ]],
+            ["Цветокоррекция и Фильтры", [
+                ["Уровни (Levels)", "Ctrl + L"],
+                ["Кривые (Curves)", "Ctrl + M"],
+                ["Цветовой тон / Насыщенность", "Ctrl + U"],
+                ["Цветовой баланс", "Ctrl + B"],
+                ["Обесцветить", "Ctrl + Shift + U"],
+                ["Инвертировать цвета", "Ctrl + I"],
+                ["Черно-белое", "Ctrl + Alt + Shift + B"],
+                ["Автотон", "Ctrl + Shift + L"],
+                ["Автоконтраст", "Ctrl + Alt + Shift + L"],
+                ["Автоцветокоррекция", "Ctrl + Shift + B"],
+                ["Повторить последний фильтр", "Ctrl + Alt + F"],
+                ["Пластика (Liquify)", "Ctrl + Shift + X"],
+                ["Camera Raw Filter", "Ctrl + Shift + A"]
+            ]],
+            ["Интерфейс и Файлы", [
+                ["Скрыть/Показать все панели (UI)", "Tab"],
+                ["Скрыть/Показать правые панели", "Shift + Tab"],
+                ["Переключение режимов экрана (F)", "F"],
+                ["Реальный размер пикселей (100%)", "Ctrl + 1"],
+                ["Подогнать под размер экрана", "Ctrl + 0"],
+                ["Включить/Отключить линейки", "Ctrl + R"],
+                ["Включить/Отключить направляющие", "Ctrl + ;"],
+                ["Включить/Отключить сетку", "Ctrl + '"],
+                ["Сохранить как", "Ctrl + Shift + S"],
+                ["Экспортировать как", "Ctrl + Alt + Shift + W"],
+                ["Сохранить для Web (Legacy)", "Ctrl + Alt + Shift + S"],
+                ["Закрыть текущий документ", "Ctrl + W"],
+                ["Закрыть все открытые документы", "Ctrl + Alt + W"]
+            ]]
+        ]},
+        ex: { id: "ex", logo: "EX", title: "EXPORT SETTINGS", color: "#10b981", meta: "<a href='https://www.shutterencoder.com/' target='_blank'>SHUTTER ENCODER OFFICIAL SITE</a>", data: [
+            ["DaVinci Resolve (Proxy)", [
+                [`<div class="dvr-ui">
+                    <div class="dvr-top">
+                        <span style="color: var(--text-base);">Render</span>
+                        <label class="dvr-ctrl disabled"><input type="radio" disabled> <span>Single clip</span></label>
+                        <label class="dvr-ctrl"><input type="radio" checked onclick="return false;"> <span>Individual clips</span></label>
+                    </div>
+                    <div class="dvr-tabs">
+                        <div class="dvr-tab active" onclick="switchDvrTab(this, 'panel-video')">Video</div>
+                        <div class="dvr-tab" onclick="switchDvrTab(this, 'panel-audio')">Audio</div>
+                        <div class="dvr-tab" onclick="switchDvrTab(this, 'panel-file')">File</div>
+                    </div>
+                    <div class="dvr-panel panel-video active">
+                        <div class="dvr-row" style="margin-bottom: 12px; margin-left: 110px;">
+                            <label class="dvr-ctrl"><input type="checkbox" checked onclick="return false;"> <span>Export Video</span></label>
+                        </div>
+                        <div class="dvr-row"><div class="dvr-label">Format</div><div class="dvr-val">QuickTime</div></div>
+                        <div class="dvr-row"><div class="dvr-label">Codec</div><div class="dvr-val">DNxHD</div></div>
+                        <div class="dvr-row"><div class="dvr-label">Type</div><div class="dvr-val">1080p 36 8-bit</div></div>
+                    </div>
+                    <div class="dvr-panel panel-audio">
+                        <div class="dvr-row" style="margin-bottom: 12px; margin-left: 110px;">
+                            <label class="dvr-ctrl"><input type="checkbox" checked onclick="return false;"> <span>Export Audio</span></label>
+                        </div>
+                        <div class="dvr-row"><div class="dvr-label">Channels</div><div class="dvr-val">Same as source</div></div>
+                        <div class="dvr-row"><div class="dvr-label">Bit Depth</div><div class="dvr-val">24</div></div>
+                    </div>
+                    <div class="dvr-panel panel-file">
+                        <div class="dvr-row" style="align-items: flex-start;">
+                            <div class="dvr-label" style="margin-top: 2px;">Filename uses</div>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <label class="dvr-ctrl disabled"><input type="radio" disabled> <span>Custom name</span></label>
+                                <label class="dvr-ctrl"><input type="radio" checked onclick="return false;"> <span>Source name</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>`, "CUSTOM_UI"]
+            ]],
+            ["Premiere (Master ProRes)", [
+                [`<div class="dvr-ui">
+                    <div class="dvr-row" style="margin-bottom: 15px;">
+                        <label class="dvr-ctrl"><input type="checkbox" onclick="return false;"> <span>Match Sequence Settings</span></label>
+                    </div>
+                    <div class="dvr-row"><div class="dvr-label" style="width: 50px; text-align: left;">Format:</div><div class="dvr-val">QuickTime</div></div>
+                    <div class="dvr-row"><div class="dvr-label" style="width: 50px; text-align: left;">Preset:</div><div class="dvr-val">Apple ProRes 422 HQ</div></div>
+                    
+                    <div class="dvr-row" style="margin-top: 20px; margin-bottom: 20px; gap: 20px;">
+                        <label class="dvr-ctrl"><input type="checkbox" checked onclick="return false;"> <span>Export Video</span></label>
+                        <label class="dvr-ctrl"><input type="checkbox" checked onclick="return false;"> <span>Export Audio</span></label>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--border-dim); margin: 0 -14px 15px -14px;"></div>
+
+                    <div style="color: var(--text-main); font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 5px;">
+                        <span style="font-size: 8px; color: var(--text-base);">▼</span> Video Codec
+                    </div>
+                    <div class="dvr-row" style="margin-bottom: 20px; padding-left: 15px;">
+                        <div class="dvr-label" style="width: 80px;">Video Codec:</div><div class="dvr-val">Apple ProRes 422 HQ</div>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--border-dim); margin: 0 -14px 15px -14px;"></div>
+
+                    <div style="color: var(--text-main); font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 5px;">
+                        <span style="font-size: 8px; color: var(--text-base);">▼</span> Basic Video Settings
+                    </div>
+                    <div class="dvr-row" style="margin-bottom: 12px;">
+                        <label class="dvr-ctrl"><input type="checkbox" checked onclick="return false;"> <span>Render at Maximum Depth</span></label>
+                    </div>
+                    <div class="dvr-row" style="padding-left: 20px;">
+                        <div class="dvr-label" style="width: 110px;">Export Color Space:</div><div class="dvr-val">Rec. 709</div>
+                    </div>
+                    <div class="dvr-row" style="padding-left: 20px; margin-top: 10px; margin-bottom: 20px;">
+                        <div class="dvr-label" style="width: 110px;">Depth:</div>
+                        <label class="dvr-ctrl disabled"><input type="radio" disabled> <span>8-bpc</span></label>
+                        <label class="dvr-ctrl" style="margin-left: 15px;"><input type="radio" checked onclick="return false;"> <span>16-bpc</span></label>
+                    </div>
+
+                    <div style="border-top: 1px solid var(--border-dim); margin: 0 -14px 15px -14px;"></div>
+
+                    <div class="dvr-row" style="margin-bottom: 0;">
+                        <label class="dvr-ctrl"><input type="checkbox" checked onclick="return false;"> <span>Use Maximum Render Quality</span></label>
+                    </div>
+                </div>`, "CUSTOM_UI"]
+            ]],
+            ["Shutter Encoder (H.264 Master)", [
+                [`<div class="dvr-ui">
+                    <div class="dvr-top" style="border-bottom: 1px solid var(--border-dim); padding-bottom: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; flex-direction: column; gap: 5px; width: 100%;">
+                            <span style="color: var(--text-base); padding-left: 2px;">Choose function</span>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div class="dvr-val" style="text-align: center;">H.264</div>
+                                <span style="color: var(--text-base); font-size: 16px;">➔</span>
+                                <div class="dvr-val" style="text-align: center;">.mov</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="se-flex">
+                        <div style="flex: 1;">
+                            <div style="color: var(--text-base); margin-bottom: 10px; font-weight: bold; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px;">Output</div>
+                            <div class="dvr-row" style="margin-bottom: 0;">
+                                <label class="dvr-ctrl"><input type="checkbox" checked onclick="return false;"> <span style="color: var(--text-base);">Add a suffix:</span></label>
+                                <div class="dvr-val" style="margin-left: 5px;">_H.264</div>
+                            </div>
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="color: var(--text-base); margin-bottom: 10px; font-weight: bold; text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px;">Bitrates adjustment</div>
+                            <div class="dvr-row" style="margin-bottom: 0;">
+                                <div class="dvr-label" style="text-align: left; width: 40px;">Value:</div>
+                                <div class="dvr-val">17</div>
+                                <div class="dvr-val" style="flex: none; width: 40px; text-align: center; font-weight: bold; background: var(--key-bg);">CQ</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>`, "CUSTOM_UI"]
+            ]]
+        ]},
+        fg: { id: "fg", logo: "FG", title: "FORMAT GUIDE", color: "#22d3ee", meta: "STANDARDS & FORMAT SPECIFICATIONS", data: [
+            ["CINEMA DCP 4K", [
+                ["Flat (1.85:1) — Стандарт для кино", "3996 × 2160"],
+                ["Scope (2.39:1) — Широкоэкранный формат", "4096 × 1716"],
+                ["Full Container (1.89:1) — Макс. контейнер", "4096 × 2160"]
+            ]],
+            ["4K DCI (Full 4K)", [
+                ["1.33:1 (4:3) — Адаптация для 4:3", "4096 × 3072"],
+                ["1.66:1 (5:3) — Близкий к киноформатам", "4096 × 2458"],
+                ["1.77:1 (16:9) — Широкоэкранный DCI", "4096 × 2304"],
+                ["1.85:1 — Универсальный киноформат", "4096 × 2214"],
+                ["2:1 — Для крупных экранов", "4096 × 2048"],
+                ["2.35:1 — Часто для кинотеатров", "4096 × 1740"],
+                ["2.39:1 (2.40) — Стандарт. широкоэкранное", "4096 × 1716"]
+            ]],
+            ["UHD (QuadHD) — 16:9", [
+                ["1.33:1 (4:3) — Квадратные кадры", "3840 × 2880"],
+                ["1.66:1 (5:3) — Творческие задачи", "3840 × 2304"],
+                ["1.77:1 (16:9) — Стандарт UHD для дома", "3840 × 2160"],
+                ["1.85:1 — Кинотеатральное соотн.", "3840 × 2076"],
+                ["2:1 — Универсальный формат", "3840 × 1920"],
+                ["2.35:1 — Широкоэкранный", "3840 × 1634"],
+                ["2.37:1 (RED Wide) — Формат RED", "3840 × 1620"],
+                ["2.39:1 (2.40) — Кино-широкоформат", "3840 × 1607"],
+                ["2.44:1 — Спец. нужды", "3840 × 1574"]
+            ]],
+            ["1080p (Full HD)", [
+                ["1.33:1 (4:3) — Старые ТВ-стандарты", "1920 × 1440"],
+                ["1.66:1 (5:3) — Фильмы", "1920 × 1152"],
+                ["1.77:1 (16:9) — Стандарт Full HD", "1920 × 1080"],
+                ["1.85:1 — Кинотеатральное соотн.", "1920 × 1038"],
+                ["2:1 — Популярно для веб-видео", "1920 × 960"],
+                ["2.35:1 — Широкоэкранный FHD", "1920 × 817"],
+                ["2.37:1 (RED Wide) — RED-формат", "1920 × 810"],
+                ["2.39:1 (2.40) — Кино-широкоформат", "1920 × 803"],
+                ["2.40:1 (Blu-Ray) — Стандарт Blu-ray", "1920 × 800"],
+                ["2.44:1 — Узкое соотношение", "1920 × 787"]
+            ]],
+            ["720p (HD) — Онлайн", [
+                ["1.33:1 (4:3) — Старые ТВ", "1280 × 960"],
+                ["1.66:1 (5:3) — Нестандартные", "1280 × 768"],
+                ["1.77:1 (16:9) — Стандарт HD", "1280 × 720"],
+                ["1.85:1 — Киноформат в HD", "1280 × 692"],
+                ["2:1 — Онлайн-контент", "1280 × 640"],
+                ["2.35:1 — Кино в HD", "1280 × 545"],
+                ["2.37:1 (RED Wide)", "1280 × 540"],
+                ["2.39:1 (2.40) — Широкоэкранное HD", "1280 × 536"],
+                ["2.44:1 — Редкоиспользуемое", "1280 × 525"]
+            ]],
+            ["Соцсети и Мобайл", [
+                ["Vertical Video (9:16) — Соцсети", "1080 × 1920"],
+                ["Square Video (1:1) — IG / FB", "1080 × 1080"],
+                ["Сверхширокоформатные мониторы (Ultra-Wide)", "2560 × 1080"],
+                ["Сверхширокоформатные мониторы (Ultra-Wide)", "3440 × 1440"]
+            ]],
+            ["ТВ и Стриминг", [
+                ["HDV — Цифровые видеокамеры", "1440 × 1080"],
+                ["2K DCI — Цифровые копии фильмов", "2048 × 1080"],
+                ["1440p — Стриминг и YouTube", "2560 × 1440"]
+            ]],
+            ["8K Ультравысокие", [
+                ["8K UHD — Потреб. и вещательное", "7680 × 4320"],
+                ["8K DCI — Проф. киносъемка", "8192 × 4320"]
+            ]],
+            ["Цвет и HDR", [
+                ["Стандарт HDR для широкого применения", "HDR10"],
+                ["Динамическое HDR (улучшенный цвет)", "Dolby Vision"],
+                ["HD-видео и ТВ (стандарт трансляций)", "Rec. 709"],
+                ["Цветовое пространство кинорелизов", "DCI-P3"],
+                ["Цветовое пространство UHD и HDR", "Rec. 2020"]
+            ]],
+            ["Дополнительно", [
+                ["IMAX Digital (1.90:1) — Вариант 1", "4096 × 2160"],
+                ["IMAX Digital (1.90:1) — Вариант 2", "3840 × 2160"],
+                ["Оцифровка 16mm и 35mm", "Custom"]
+            ]]
+        ]},
+        pp: { id: "pp", logo: "PP", title: "POTPLAYER", color: "#fbbf24", meta: "F1 > ГОРЯЧИЕ КЛАВИШИ; F5 > ОБЩИЕ > КЛАВИАТУРА", data: [
+            ["Воспроизведение", [
+                ["Плей / Пауза", "Space / K"],
+                ["Обычная скорость", "Z"],
+                ["Ускорить / Замедлить", "C / X"],
+                ["След. / Пред. кадр", "F / D"],
+                ["В начало файла", "Backspace"],
+                ["За 30 сек. до конца", "Shift + Bksp"],
+                ["В середину файла", "Ctrl + Bksp"],
+                ["Переход на время/кадр", "G"]
+            ]],
+            ["Навигация по времени", [
+                ["Вперед / Назад 5 сек.", "Right / Left"],
+                ["Вперед / Назад 30 сек.", "Ctrl + Right / Left"],
+                ["Вперед / Назад 1 мин.", "Shift + Right / Left"],
+                ["Вперед / Назад 5 мин.", "Ctrl + Alt + R / L"],
+                ["След. / Пред. ключевой кадр", "Ctrl + Shift + R / L"]
+            ]],
+            ["Окно и Интерфейс", [
+                ["Во весь экран (пропорционально)", "Enter"],
+                ["Растянуть во весь экран", "Ctrl + Enter"],
+                ["Во весь экран (сохр. пропорций)", "Ctrl + Alt + Enter"],
+                ["Настройки / Плей-лист / Панель", "F5 / F6 / F7"],
+                ["Минимальный размер окна", "` (Тильда)"],
+                ["Размер окна 50% / 100% / 150% / 200%", "1 / 2 / 3 / 4"],
+                ["Устранить пустые области", "8"],
+                ["Информация о файле (OSD)", "Tab"]
+            ]],
+            ["Видео и Кадры", [
+                ["Выбор видеопотока", "V"],
+                ["Яркость (+ / -)", "E / W"],
+                ["Контраст (+ / -)", "T / R"],
+                ["Насыщенность (+ / -)", "U / Y"],
+                ["Оттенок (+ / -)", "O / I"],
+                ["Сброс параметров видео", "Q"],
+                ["Сохранить текущий кадр", "Ctrl + E"],
+                ["Копировать кадр в буфер", "Ctrl + C"]
+            ]],
+            ["Аудио", [
+                ["Громкость (+ / -)", "Up / Down"],
+                ["Вкл / Выкл звук (Mute)", "M"],
+                ["Выбор аудио-дорожки", "A"],
+                ["Синхронизация звука (+/- 0.1с)", "Shift + . / ,"],
+                ["Сброс синхронизации звука", "Shift + /"],
+                ["Эквалайзер / Нормализация", "Shift + E / N"],
+                ["Шумоподавление / Очистка", "Shift + D / C"],
+                ["Уменьшить / Усилить голос", "Shift + V / A"]
+            ]],
+            ["Субтитры", [
+                ["Выбор субтитров", "L"],
+                ["Показать / Скрыть субтитры", "Alt + H"],
+                ["Синхронизация сабов (+/- 0.5с)", ". / ,"],
+                ["Синхронизация сабов (+/- 5с)", "Ctrl + . / ,"],
+                ["Сброс синхронизации сабов", "/"],
+                ["Размер шрифта (+ / -)", "Alt + PgUp / PgDn"],
+                ["Сдвиг субтитров по экрану", "Alt + Arrows"],
+                ["К след. / пред. позиции текста", "End / Home"]
+            ]],
+            ["Повтор отрезка (A-B)", [
+                ["Задать начало / конец отрезка", "[ / ]"],
+                ["Отменить начало / конец", "{ / }"],
+                ["Отменить повтор", "\\"],
+                ["Меню повтора отрезка", "B"]
+            ]]
+        ]},
+        yt: { id: "yt", logo: "YT", title: "YOUTUBE", color: "#ef4444", meta: "<a href='https://support.google.com/youtube/answer/7631406?hl=ru' target='_blank'>OFFICIAL YOUTUBE SHORTCUTS</a>", data: [
+            ["Воспроизведение", [
+                ["Плей / Пауза", "Space / K"],
+                ["Вкл/Выкл звук (Mute)", "M"],
+                ["Громкость +5% / -5%", "Up / Down"],
+                ["Ускорить / Замедлить", "Shift + . / ,"],
+                ["В начало / В конец видео", "Home / End"]
+            ]],
+            ["Навигация по времени", [
+                ["Назад / Вперед на 5 сек", "Left / Right"],
+                ["Назад / Вперед на 10 сек", "J / L"],
+                ["След. / Пред. кадр (на паузе)", ". / ,"],
+                ["След. / Пред. эпизод", "Ctrl + Right / Left"],
+                ["Переход 0–90% длительности", "0 - 9"]
+            ]],
+            ["Интерфейс и Плейлисты", [
+                ["На весь экран", "F"],
+                ["Мини-проигрыватель", "I"],
+                ["Вкл/Выкл субтитры", "C"],
+                ["Перейти в окно поиска", "/"],
+                ["След. / Пред. видео (плейлист)", "Shift + N / P"]
+            ]]
+        ]}
+    };
+
+    let favorites = [];
+    let collapsedStates = [];
+    
+    try { 
+        let favData = storage.get('kb_fav_data', null);
+        if (favData) favorites = JSON.parse(favData);
+    } catch(e) {}
+    
+    try { 
+        let colData = storage.get('kb_collapsed_data', null);
+        if (colData) collapsedStates = JSON.parse(colData);
+    } catch(e) {}
+    
+    let currentApp = 'tg'; 
+
+    function getCols() {
+        if (window.innerWidth <= 1024) return 1;
+        if (window.innerWidth <= 1600) return 2;
+        return 3;
+    }
+    
+    let currentCols = getCols();
+    window.addEventListener('resize', () => {
+        const newCols = getCols();
+        if (newCols !== currentCols) {
+            currentCols = newCols;
+            if (document.getElementById('search-input').value.trim()) {
+                handleSearch(document.getElementById('search-input').value.trim());
+            } else {
+                renderMain(currentApp);
+            }
+        }
+    });
+
+    function createGridCols() {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = '';
+        const colsCount = getCols();
+        for(let i=0; i<colsCount; i++) {
+            grid.innerHTML += `<div class="grid-col" id="col-${i}"></div>`;
+        }
+        return colsCount;
+    }
+
+    function init() {
+        renderNav();
+        renderMain(currentApp);
+    }
+
+    function renderNav() {
+        const nav = document.getElementById('nav');
+        nav.innerHTML = '';
+        nav.appendChild(createNavBtn('fav', 'FAVORITES', currentApp === 'fav', 'FV', '#ca8a04'));
+
+        Object.keys(rawData).forEach(key => {
+            const app = rawData[key];
+            nav.appendChild(createNavBtn(key, app.title, currentApp === key, app.logo, app.color));
+        });
+    }
+
+    function createNavBtn(id, text, isActive, logoText, color) {
+        const btn = document.createElement('button');
+        btn.className = `nav-btn ${isActive ? 'active' : ''}`;
+        btn.style.setProperty('--app-color', color);
+        btn.onclick = () => { 
+            document.getElementById('search-input').value = '';
+            currentApp = id; 
+            renderNav(); 
+            renderMain(id); 
+        };
+        btn.innerHTML = `<div class="nav-left"><div class="logo-box">${logoText}</div><span>${text}</span></div>`;
+        return btn;
+    }
+
+    function toggleCategory(el, catId) {
+        const categoryDiv = el.parentElement;
+        categoryDiv.classList.toggle('collapsed');
+        
+        if (catId) {
+            const isCollapsed = categoryDiv.classList.contains('collapsed');
+            const idx = collapsedStates.indexOf(catId);
+            
+            if (isCollapsed && idx === -1) {
+                collapsedStates.push(catId);
+            } else if (!isCollapsed && idx > -1) {
+                collapsedStates.splice(idx, 1);
+            }
+            storage.set('kb_collapsed_data', JSON.stringify(collapsedStates));
+        }
+    }
+
+    function toggleFav(btn, event) {
+        event.stopPropagation();
+        const strId = btn.getAttribute('data-id');
+        const idx = favorites.indexOf(strId);
+        const isRemoving = idx > -1;
+
+        if (isRemoving) {
+            favorites.splice(idx, 1);
+            btn.classList.remove('active');
+            btn.style.color = '';
+        } else {
+            favorites.push(strId);
+            btn.classList.add('active');
+            btn.style.color = 'var(--current-color)';
+        }
+        storage.set('kb_fav_data', JSON.stringify(favorites));
+        
+        const searchVal = document.getElementById('search-input').value.trim();
+        if (currentApp === 'fav' && !searchVal && isRemoving) {
+            const itemDiv = btn.closest('.item');
+            const categoryDiv = btn.closest('.category');
+            
+            if (itemDiv) itemDiv.remove();
+            
+            if (categoryDiv && categoryDiv.querySelectorAll('.item').length === 0) {
+                categoryDiv.remove();
+            }
+        }
+    }
+
+    function copyKey(el) {
+        const keyText = el.getAttribute('data-key');
+        if (!keyText) return;
+        
+        navigator.clipboard.writeText(keyText).then(() => {
+            const originalText = el.innerHTML;
+            el.innerHTML = "Скопировано";
+            el.style.color = "var(--current-color)";
+            el.style.borderColor = "var(--current-color)";
+            
+            setTimeout(() => {
+                el.innerHTML = originalText;
+                el.style.color = "";
+                el.style.borderColor = "";
+            }, 300);
+        });
+    }
+
+    function buildCategoryHTML(catId, title, itemsHtml) {
+        const isCollapsed = collapsedStates.includes(catId);
+        const collapsedClass = isCollapsed ? 'collapsed' : '';
+        return `
+        <div class="category ${collapsedClass}">
+            <div class="cat-title" onclick="toggleCategory(this, '${catId}')">${title}</div>
+            <div class="cat-content">${itemsHtml}</div>
+        </div>`;
+    }
+
+    function buildItem(appId, catName, desc, keys) {
+        const strId = `${appId}|${catName}|${desc}`;
+        const isFav = favorites.includes(strId);
+        const activeFavStyle = isFav ? `style="color: var(--current-color);"` : '';
+        const keyClass = (appId === 'ex' || appId === 'fm' || appId === 'fg') ? 'item-keys setting-val' : 'item-keys';
+        const showStar = (appId !== 'ex' && appId !== 'fm' && appId !== 'fg');
+        
+        const starHtml = showStar 
+            ? `<button class="fav ${isFav ? 'active' : ''}" ${activeFavStyle} data-id="${strId}" onclick="toggleFav(this, event)">★</button>` 
+            : '';
+        
+        return `
+            <div class="item">
+                <div class="item-desc">${desc}</div>
+                <div class="${keyClass}" data-key="${keys}" onclick="copyKey(this)">${keys}</div>
+                ${starHtml}
+            </div>`;
+    }
+
+    function handleSearch(query) {
+        query = query.toLowerCase().trim();
+        if (!query) {
+            renderMain(currentApp);
+            return;
+        }
+        
+        const titleEl = document.getElementById('title');
+        const mainArea = document.getElementById('main-area');
+        mainArea.style.setProperty('--current-color', '#64748b'); 
+        titleEl.innerHTML = `<div class="header-title">>_ ПОИСК: ${query.toUpperCase()}</div>`;
+
+        const colsCount = createGridCols();
+        let colIndex = 0;
+        let hasResults = false;
+
+        Object.keys(rawData).forEach(appId => {
+            const app = rawData[appId];
+            let itemsHtml = '';
+            
+            app.data.forEach(cat => {
+                cat[1].forEach(item => {
+                    const desc = item[0];
+                    const keys = item[1];
+                    if (keys === "CUSTOM_UI") {
+                        if (desc.toLowerCase().includes(query) || app.title.toLowerCase().includes(query)) {
+                            itemsHtml += desc;
+                        }
+                    } else {
+                        if (desc.toLowerCase().includes(query) || keys.toLowerCase().includes(query) || app.title.toLowerCase().includes(query)) {
+                            itemsHtml += buildItem(appId, cat[0], desc, keys);
+                        }
+                    }
+                });
+            });
+
+            if (itemsHtml) {
+                hasResults = true;
+                const catId = `search|${appId}`;
+                const isCollapsed = collapsedStates.includes(catId);
+                const collapsedClass = isCollapsed ? 'collapsed' : '';
+                
+                const catHtml = `
+                <div class="category ${collapsedClass}" style="--current-color: ${app.color}; border-color: ${app.color};">
+                    <div class="cat-title" style="color: ${app.color};" onclick="toggleCategory(this, '${catId}')">
+                        ${app.title}
+                    </div>
+                    <div class="cat-content">
+                        ${itemsHtml}
+                    </div>
+                </div>`;
+                
+                document.getElementById(`col-${colIndex}`).innerHTML += catHtml;
+                colIndex = (colIndex + 1) % colsCount;
+            }
+        });
+
+        if (!hasResults) {
+            document.getElementById('grid').innerHTML = `<div style="width:100%; color: var(--text-main);">Ничего не найдено.</div>`;
+        }
+    }
+
+    function renderMain(id) {
+        const titleEl = document.getElementById('title');
+        const mainArea = document.getElementById('main-area');
+
+        if (id === 'fav') {
+            mainArea.style.setProperty('--current-color', '#ca8a04');
+            const metaHtml = '<span class="header-meta">ОТМЕЧАЙТЕ НУЖНЫЕ КОМАНДЫ ЗВЕЗДОЧКОЙ</span>';
+            titleEl.innerHTML = `<div class="header-title">>_ FAVORITES</div>${metaHtml}`;
+            
+            if (!favorites.length) {
+                document.getElementById('grid').innerHTML = '';
+                return;
+            }
+
+            const colsCount = createGridCols();
+            let colIndex = 0;
+            let favGroups = {};
+            
+            favorites.forEach(strId => {
+                const parts = strId.split('|');
+                if(parts.length === 3) {
+                    const appId = parts[0];
+                    if (!favGroups[appId]) favGroups[appId] = [];
+                    favGroups[appId].push(strId);
+                }
+            });
+
+            Object.keys(favGroups).forEach(appId => {
+                const app = rawData[appId];
+                if(!app) return;
+                
+                let itemsHtml = '';
+                favGroups[appId].forEach(strId => {
+                    const [_, catName, desc] = strId.split('|');
+                    const catData = app.data.find(c => c[0] === catName);
+                    if(catData) {
+                        const itemData = catData[1].find(i => i[0] === desc);
+                        if(itemData) {
+                            const keys = itemData[1];
+                            itemsHtml += buildItem(appId, catName, desc, keys);
+                        }
+                    }
+                });
+                
+                if(itemsHtml) {
+                    const catId = `fav|${appId}`;
+                    const isCollapsed = collapsedStates.includes(catId);
+                    const collapsedClass = isCollapsed ? 'collapsed' : '';
+                    
+                    const catHtml = `
+                    <div class="category ${collapsedClass}" style="--current-color: ${app.color}; border-color: ${app.color};">
+                        <div class="cat-title" style="color:${app.color};" onclick="toggleCategory(this, '${catId}')">
+                            ${app.title}
+                        </div>
+                        <div class="cat-content">
+                            ${itemsHtml}
+                        </div>
+                    </div>`;
+                    
+                    document.getElementById(`col-${colIndex}`).innerHTML += catHtml;
+                    colIndex = (colIndex + 1) % colsCount;
+                }
+            });
+            return;
+        }
+
+        const app = rawData[id];
+        mainArea.style.setProperty('--current-color', app.color);
+        
+        let metaHtml = '';
+        if(app.meta) {
+            metaHtml = `<span class="header-meta">${app.meta}</span>`;
+        }
+        titleEl.innerHTML = `<div class="header-title">>_ ${app.title}</div>${metaHtml}`;
+        
+        const colsCount = createGridCols();
+        let colIndex = 0;
+
+        if(app.data) {
+            app.data.forEach(cat => {
+                let itemsHtml = '';
+                cat[1].forEach(item => {
+                    if (item[1] === "CUSTOM_UI") {
+                        itemsHtml += item[0];
+                    } else {
+                        itemsHtml += buildItem(id, cat[0], item[0], item[1]);
+                    }
+                });
+                const catId = `${id}|${cat[0]}`;
+                const catHtml = buildCategoryHTML(catId, cat[0], itemsHtml);
+                
+                document.getElementById(`col-${colIndex}`).innerHTML += catHtml;
+                colIndex = (colIndex + 1) % colsCount;
+            });
+        }
+    }
+
+    // Жесткий старт без привязки к onload
+    init();
+
+</script>
+</body>
+</html>
