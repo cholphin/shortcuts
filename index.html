@@ -70,45 +70,38 @@
             transition: background-color 0.3s, border-color 0.3s;
         }
 
+        /* ИДЕАЛЬНАЯ ГЕОМЕТРИЯ ШАПКИ САЙДБАРА */
         .brand-header {
             display: flex;
             justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 14px; 
-            padding: 0 11px 0 5px;
+            align-items: flex-start;
+            height: 16px;
+            margin-bottom: 15px; 
+            padding: 0 11px 0 5px; /* Синхрон с search-box */
         }
 
         .brand {
-            font-size: 15px;
+            font-size: 16px;
+            line-height: 16px;
             color: var(--text-main);
             font-weight: normal;
             text-transform: uppercase;
             letter-spacing: 1px;
-            line-height: 1;
         }
 
         .lang-switch {
             display: flex;
             gap: 6px;
-            font-size: 15px;
+            font-size: 16px;
+            line-height: 16px;
             letter-spacing: 1px;
             color: var(--text-base);
-            line-height: 1;
-            margin-right: -1px;
         }
 
-        .lang-btn {
-            cursor: pointer;
-            transition: color 0.2s;
-        }
+        .lang-btn { cursor: pointer; transition: color 0.2s; }
+        .lang-btn:hover, .lang-btn.active { color: var(--text-main); }
+        .lang-sep { opacity: 0.4; cursor: default; }
 
-        .lang-btn:hover, .lang-btn.active {
-            color: var(--text-main);
-        }
-
-        .lang-sep { opacity: 0.5; cursor: default; }
-
-        /* Search Box */
         .search-box { margin-bottom: 16px; padding: 0 11px 0 5px; }
         .search-input {
             width: 100%; height: 34px; background: var(--bg-main);
@@ -119,11 +112,7 @@
         .search-input:focus { border-color: var(--text-base); }
         .search-input::placeholder { color: var(--text-base); }
 
-        .nav-list {
-            flex: 1; overflow-y: scroll; overflow-x: hidden;
-            display: flex; flex-direction: column; gap: 2px; padding: 0 5px;
-        }
-
+        .nav-list { flex: 1; overflow-y: scroll; overflow-x: hidden; display: flex; flex-direction: column; gap: 2px; padding: 0 5px; }
         .nav-btn {
             background: transparent; border: 1px solid transparent; color: var(--text-base);
             padding: 6px 10px; border-radius: 6px; cursor: pointer;
@@ -131,27 +120,16 @@
             display: flex; align-items: center; font-family: inherit;
             font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
         }
-
         .nav-btn:hover { background: var(--item-hover); color: var(--text-main); }
         .nav-btn.active { background: var(--active-bg); border-color: var(--border-dim); color: var(--app-color); }
         .nav-left { display: flex; align-items: center; gap: 10px; }
         .nav-left > span { position: relative; top: -1px; }
         
-        .logo-box {
-            font-weight: normal; font-size: 11px; letter-spacing: 0; color: inherit;
-            width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
-            line-height: 1; border: 1px solid currentColor; border-radius: 4px; transition: opacity 0.2s; opacity: 0.8; 
-        }
+        .logo-box { font-weight: normal; font-size: 11px; letter-spacing: 0; color: inherit; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; line-height: 1; border: 1px solid currentColor; border-radius: 4px; transition: opacity 0.2s; opacity: 0.8; }
         .nav-btn:hover .logo-box, .nav-btn.active .logo-box { opacity: 1; }
 
-        /* Sidebar Bottom */
         .sidebar-bottom { margin-top: auto; padding-top: 15px; display: flex; flex-direction: column; gap: 15px; }
-
-        .theme-switch-wrapper {
-            display: flex; align-items: center; justify-content: center; gap: 14px; 
-            padding: 15px 5px 0 5px; border-top: 1px solid var(--border-dim); color: var(--text-base); 
-        }
-        
+        .theme-switch-wrapper { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 15px 5px 0 5px; border-top: 1px solid var(--border-dim); color: var(--text-base); }
         .theme-label { text-align: center; font-size: 11px; letter-spacing: 1px; cursor: pointer; transition: color 0.3s; user-select: none; line-height: 1; }
         .label-light { position: relative; left: 2px; }
         [data-theme="light"] .label-light { color: var(--text-main); }
@@ -166,11 +144,31 @@
         .author-credit { align-self: center; text-align: center; font-size: 9px; color: var(--text-base); letter-spacing: 0.4px; text-transform: uppercase; opacity: 0.5; transition: opacity 0.3s, color 0.3s; user-select: none; text-decoration: none; line-height: 1; }
         .author-credit:hover { opacity: 1; color: var(--text-main); }
 
-        /* Main Content */
-        .main { flex: 1; padding: 30px 40px; overflow-y: scroll; position: relative; transition: background-color 0.3s; -webkit-overflow-scrolling: touch; }
+        /* ИДЕАЛЬНОЕ ВЫРАВНИВАНИЕ КОНТЕНТА ПО "КРАСНЫМ ЛИНИЯМ" */
+        .main { flex: 1; padding: 15px 40px 30px 40px; overflow-y: scroll; position: relative; transition: background-color 0.3s; -webkit-overflow-scrolling: touch; }
+        
+        .header { 
+            display: flex; justify-content: space-between; align-items: flex-start; 
+            height: 31px; /* 15px padding_top + 31px = 46px (точно совпадает с верхом окна поиска) */
+            margin-bottom: 20px; 
+            border-bottom: 1px solid var(--border-dim); 
+            box-sizing: border-box; transition: border-color 0.3s; 
+        }
+        
+        .header-left { 
+            display: flex; align-items: center; gap: 20px; 
+            height: 16px; /* Жесткая привязка к высоте текста SOFTWARE */
+        }
+        
+        .header-title { font-size: 16px; line-height: 16px; font-weight: normal; color: var(--current-color); text-transform: uppercase; letter-spacing: 1px; }
+        
+        .os-switch { font-size: 16px; line-height: 16px; letter-spacing: 1px; color: var(--current-color); display: flex; gap: 6px; }
+        .os-btn { cursor: pointer; opacity: 0.4; transition: opacity 0.2s; }
+        .os-btn.active { opacity: 1; }
+        .os-switch.static .os-btn { opacity: 1; cursor: default; }
+        .os-sep { opacity: 0.4; cursor: default; }
 
-        .header { margin-bottom: 25px; display: flex; align-items: flex-end; justify-content: space-between; padding-bottom: 15px; border-bottom: 1px solid var(--border-dim); transition: border-color 0.3s; }
-        .header-title { font-size: 16px; font-weight: normal; color: var(--current-color); text-transform: uppercase; letter-spacing: 1px; }
+        .header-meta { align-self: flex-end; margin-bottom: 6px; }
         .header-meta, .header-meta a { font-size: 9px; color: var(--text-base); letter-spacing: 0.4px; text-transform: uppercase; text-decoration: none; opacity: 0.8; transition: opacity 0.2s, color 0.2s; font-weight: normal; text-align: right; }
         .header-meta a:hover { color: var(--text-main); opacity: 1; }
 
@@ -193,13 +191,6 @@
             min-width: 0;
         }
         
-        .os-headers { display: flex; gap: 8px; margin-right: 28px; flex-shrink: 0; }
-        .os-head { 
-            width: var(--btn-width); text-align: center; 
-            font-size: 11px; font-weight: normal; letter-spacing: 0.5px; 
-            color: inherit; 
-        }
-
         .cat-title::after {
             content: ''; position: absolute; right: 14px; top: 50%; margin-top: -3px;
             width: 6px; height: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
@@ -269,7 +260,7 @@
         @media (max-width: 1024px) {
             body { flex-direction: column; }
             .sidebar { width: 100%; padding: 15px; border-right: none; border-bottom: 1px solid var(--border-dim); flex: none; }
-            .brand-header { margin-bottom: 15px; padding: 0; justify-content: space-between; }
+            .brand-header { margin-bottom: 15px; padding: 0; }
             .search-box { margin-bottom: 15px; padding: 0; }
             .nav-list { flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 0 0 5px 0; margin-bottom: 0; }
             .nav-btn { flex: 0 0 auto; padding: 8px 14px; }
@@ -277,8 +268,9 @@
             .theme-switch-wrapper { border: none; padding: 0; margin: 0; }
             .author-credit { margin: 0; }
             .main { padding: 15px; }
-            .header { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .header-meta { text-align: left; }
+            .header { height: auto; flex-direction: column; align-items: flex-start; gap: 8px; padding-bottom: 10px; margin-bottom: 15px; }
+            .header-left { flex-direction: column; gap: 8px; height: auto; }
+            .header-meta { text-align: left; align-self: flex-start; margin-bottom: 0; }
             .grid { flex-direction: column; align-items: stretch; gap: 15px; }
             .grid-col { width: 100%; }
             .category { width: 100%; }
@@ -289,8 +281,6 @@
         @media (max-width: 600px) {
             :root { --btn-width: 95px; }
             .item-keys { font-size: 9px; padding: 4px; }
-            .os-head { font-size: 9px; }
-            .item-shortcuts, .os-headers { gap: 4px; }
             .item-desc { padding-right: 8px; }
         }
     </style>
@@ -330,6 +320,8 @@
     };
 
     let currentLang = storage.get('kb_lang_v2', 'ru');
+    let currentOS = storage.get('kb_os', 'win');
+
     function setLang(lang) {
         currentLang = lang;
         storage.set('kb_lang_v2', lang);
@@ -342,6 +334,15 @@
         if (searchVal) handleSearch(searchVal);
         else renderMain(currentApp);
     }
+
+    function setOS(os) {
+        currentOS = os;
+        storage.set('kb_os', os);
+        const searchVal = document.getElementById('search-input').value.trim();
+        if (searchVal) handleSearch(searchVal);
+        else renderMain(currentApp);
+    }
+
     document.getElementById('lang-ru').classList.toggle('active', currentLang === 'ru');
     document.getElementById('lang-en').classList.toggle('active', currentLang === 'en');
     document.getElementById('search-input').placeholder = currentLang === 'ru' ? 'ПОИСК...' : 'SEARCH...';
@@ -358,8 +359,7 @@
         ui.querySelector('.' + tabClass).classList.add('active');
     }
 
-    const dualOsApps = ['tg', 'cb', 'gd', 'gs', 'wn', 'pr', 'da', 'cc', 'au', 'ae', 'ps', 'bl', 'yt'];
-
+    // DATA FORMAT: [ "Category RU", "Category EN", [ ["Desc RU", "Desc EN", "Win", "Mac"] ] ]
     const rawData = {
         tg: { id: "tg", logo: "TG", title: "TELEGRAM", color: "#24a1de", meta: ["НАСТРОЙКИ > ГОРЯЧИЕ КЛАВИШИ", "SETTINGS > KEYBOARD SHORTCUTS"], data: [
             ["Приложение", "Application", [
@@ -634,7 +634,7 @@
                 ["Настройки системы", "System Settings", "Win + I", "Cmd + ,"],
                 ["Блокировка системы", "Lock Account", "Win + L", "Cmd + Ctrl + Q"],
                 ["Меню проекции (мониторы)", "Display Projection Menu", "Win + P", "Cmd + F1"],
-                ["Очистить корзину", "Empty Trash", "ПКМ", "Cmd + Shift + Bksp"]
+                ["Очистить корзину", "Empty Trash", "ПКМ по корзине", "Cmd + Shift + Bksp"]
             ]],
             ["Окна и пространство", "Windows & Workspace", [
                 ["Свернуть всё (Рабочий стол)", "Show Desktop", "Win + D", "Cmd + F3"],
@@ -819,7 +819,7 @@
                 ["Скрытое меню языка (Debug)", "Console / Debug Menu", "Ctrl + F12", "Cmd + F12"]
             ]]
         ]},
-        da: { id: "da", logo: "DR", title: "DAVINCI RESOLVE", color: "#c2410c", meta: ["<a href='https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion' target='_blank'>ГОРЯЧИЕ КЛАВИШИ BLACKMAGIC</a>", "<a href='https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion' target='_blank'>BLACKMAGIC KEYBOARD SHORTCUTS</a>"], data: [
+        da: { id: "da", logo: "DR", title: "DAVINCI RESOLVE", color: "#c2410c", meta: ["<a href='https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion' target='_blank'>ГОРЯЧИЕ КЛАВИШИ DAVINCI RESOLVE</a>", "<a href='https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion' target='_blank'>DAVINCI RESOLVE KEYBOARD SHORTCUTS</a>"], data: [
             ["Интерфейс", "Interface & Pages", [
                 ["Настройки пользователя", "User Preferences", "Ctrl + ,", "Cmd + ,"],
                 ["Настройки проекта", "Project Settings", "Shift + 9", "Shift + 9"],
@@ -986,7 +986,7 @@
                 ["Просмотр аним. рендера", "View Animation", "Ctrl + F11", "Cmd + F11"]
             ]]
         ]},
-        cc: { id: "cc", logo: "CC", title: "CAPCUT", color: "#475569", meta: ["ГЛАВНОЕ МЕНЮ > СОЧЕТАНИЯ КЛАВИШ", "MAIN MENU > SHORTCUTS"], data: [
+        cc: { id: "cc", logo: "CC", title: "CAPCUT", color: "#475569", meta: ["МЕНЮ > ГОРЯЧИЕ КЛАВИШИ", "MENU > KEYBOARD SHORTCUTS"], data: [
             ["Файл и Базовые", "File & Basic", [
                 ["Новый проект", "New Project", "Ctrl + N", "Cmd + N"],
                 ["Импорт медиа", "Import Media", "Ctrl + I", "Cmd + I"],
@@ -1779,25 +1779,13 @@
         });
     }
 
-    function buildCategoryHTML(catId, title, itemsHtml, showOsHeaders) {
+    function buildCategoryHTML(catId, title, itemsHtml) {
         const isCollapsed = collapsedStates.includes(catId);
         const collapsedClass = isCollapsed ? 'collapsed' : '';
-        
-        let osHeadersHtml = '';
-        if (showOsHeaders) {
-            osHeadersHtml = `
-                <div class="os-headers">
-                    <div class="os-head">WINDOWS</div>
-                    <div class="os-head">macOS</div>
-                </div>
-            `;
-        }
-
         return `
         <div class="category ${collapsedClass}">
             <div class="cat-title" onclick="toggleCategory(this, '${catId}')">
                 <div class="cat-name" title="${title}">${title}</div>
-                ${osHeadersHtml}
             </div>
             <div class="cat-content">${itemsHtml}</div>
         </div>`;
@@ -1812,6 +1800,12 @@
             return currentLang === 'ru' ? descRU : descEN;
         }
 
+        const isWinOnly = ['np', 'tc', 'pp'].includes(appId);
+        let activeKey = keysWin;
+        if (!isWinOnly && currentOS === 'mac' && keysMac !== undefined) {
+            activeKey = keysMac;
+        }
+
         const isSettings = (appId === 'ex' || appId === 'fm' || appId === 'fg');
         const keyClass = isSettings ? 'item-keys setting-val' : 'item-keys';
         const showStar = !isSettings;
@@ -1820,16 +1814,7 @@
             ? `<button class="fav ${isFav ? 'active' : ''}" ${activeFavStyle} data-id="${strId}" onclick="toggleFav(this, event)">★</button>` 
             : '';
         
-        let keysHtml = '';
-        if (isSettings) {
-            keysHtml = `<div class="${keyClass}" data-key="${keysWin}" onclick="copyKey(this)">${keysWin}</div>`;
-        } else {
-            keysHtml += `<div class="${keyClass}" data-key="${keysWin}" onclick="copyKey(this)">${keysWin}</div>`;
-            if (keysMac !== undefined) {
-                keysHtml += `<div class="${keyClass}" data-key="${keysMac}" onclick="copyKey(this)">${keysMac}</div>`;
-            }
-        }
-
+        let keysHtml = `<div class="${keyClass}" data-key="${activeKey}" onclick="copyKey(this)">${activeKey}</div>`;
         const displayDesc = currentLang === 'ru' ? descRU : descEN;
 
         return `
@@ -1847,7 +1832,21 @@
         const titleEl = document.getElementById('title');
         const mainArea = document.getElementById('main-area');
         mainArea.style.setProperty('--current-color', '#64748b'); 
-        titleEl.innerHTML = `<div class="header-title">>_ ${currentLang === 'ru' ? 'ПОИСК:' : 'SEARCH:'} ${query.toUpperCase()}</div>`;
+        
+        let osHtml = `
+            <div class="os-switch">
+                <span class="os-btn ${currentOS === 'win' ? 'active' : ''}" onclick="setOS('win')">WIN</span>
+                <span class="os-sep">/</span>
+                <span class="os-btn ${currentOS === 'mac' ? 'active' : ''}" onclick="setOS('mac')">MAC</span>
+            </div>
+        `;
+        
+        titleEl.innerHTML = `
+            <div class="header-left">
+                <div class="header-title">>_ ${currentLang === 'ru' ? 'ПОИСК:' : 'SEARCH:'} ${query.toUpperCase()}</div>
+                ${osHtml}
+            </div>
+        `;
 
         const colsCount = createGridCols();
         let colIndex = 0;
@@ -1856,6 +1855,7 @@
         Object.keys(rawData).forEach(appId => {
             const app = rawData[appId];
             let itemsHtml = '';
+            const isWinOnly = ['np', 'tc', 'pp'].includes(appId);
             
             app.data.forEach(cat => {
                 cat[2].forEach(item => {
@@ -1865,15 +1865,17 @@
                     const keysMac = item[3];
                     const displayDesc = currentLang === 'ru' ? descRU : descEN;
                     
+                    let targetKey = keysWin;
+                    if (!isWinOnly && currentOS === 'mac' && keysMac !== undefined) targetKey = keysMac;
+
                     if (keysWin === "CUSTOM_UI") {
                         if (displayDesc.toLowerCase().includes(query) || app.title.toLowerCase().includes(query)) itemsHtml += displayDesc;
                     } else {
                         const matchDesc = displayDesc.toLowerCase().includes(query);
-                        const matchWin = keysWin.toLowerCase().includes(query);
-                        const matchMac = keysMac ? keysMac.toLowerCase().includes(query) : false;
+                        const matchKey = targetKey.toLowerCase().includes(query);
                         const matchApp = app.title.toLowerCase().includes(query);
                         
-                        if (matchDesc || matchWin || matchMac || matchApp) {
+                        if (matchDesc || matchKey || matchApp) {
                             itemsHtml += buildItem(appId, cat[1], descRU, descEN, keysWin, keysMac);
                         }
                     }
@@ -1885,20 +1887,10 @@
                 const catId = `search|${appId}`;
                 const isCollapsed = collapsedStates.includes(catId);
                 const collapsedClass = isCollapsed ? 'collapsed' : '';
-                const showHeaders = dualOsApps.includes(appId);
-                
-                let osHeadersHtml = showHeaders ? `
-                    <div class="os-headers">
-                        <div class="os-head">WINDOWS</div>
-                        <div class="os-head">macOS</div>
-                    </div>
-                ` : '';
-
                 const catHtml = `
                 <div class="category ${collapsedClass}" style="--current-color: ${app.color}; border-color: ${app.color};">
                     <div class="cat-title" style="color: ${app.color};" onclick="toggleCategory(this, '${catId}')">
                         <div class="cat-name">${app.title}</div>
-                        ${osHeadersHtml}
                     </div>
                     <div class="cat-content">
                         ${itemsHtml}
@@ -1919,8 +1911,21 @@
 
         if (id === 'fav') {
             mainArea.style.setProperty('--current-color', '#ca8a04');
-            const metaStr = currentLang === 'ru' ? 'ОТМЕЧАЙТЕ НУЖНЫЕ КОМАНДЫ ЗВЕЗДОЧКОЙ' : 'MARK YOUR WORKFLOW SHORTCUTS';
-            titleEl.innerHTML = `<div class="header-title">>_ ${currentLang === 'ru' ? 'ИЗБРАННОЕ' : 'FAVORITES'}</div><span class="header-meta">${metaStr}</span>`;
+            let osHtml = `
+                <div class="os-switch">
+                    <span class="os-btn ${currentOS === 'win' ? 'active' : ''}" onclick="setOS('win')">WIN</span>
+                    <span class="os-sep">/</span>
+                    <span class="os-btn ${currentOS === 'mac' ? 'active' : ''}" onclick="setOS('mac')">MAC</span>
+                </div>
+            `;
+            
+            titleEl.innerHTML = `
+                <div class="header-left">
+                    <div class="header-title">>_ ${currentLang === 'ru' ? 'ИЗБРАННОЕ' : 'FAVORITES'}</div>
+                    ${osHtml}
+                </div>
+            `;
+            
             if (!favorites.length) { document.getElementById('grid').innerHTML = ''; return; }
 
             const colsCount = createGridCols();
@@ -1954,20 +1959,11 @@
                     const catId = `fav|${appId}`;
                     const isCollapsed = collapsedStates.includes(catId);
                     const collapsedClass = isCollapsed ? 'collapsed' : '';
-                    const showHeaders = dualOsApps.includes(appId);
-                    
-                    let osHeadersHtml = showHeaders ? `
-                        <div class="os-headers">
-                            <div class="os-head">WINDOWS</div>
-                            <div class="os-head">macOS</div>
-                        </div>
-                    ` : '';
                     
                     const catHtml = `
                     <div class="category ${collapsedClass}" style="--current-color: ${app.color}; border-color: ${app.color};">
                         <div class="cat-title" style="color:${app.color};" onclick="toggleCategory(this, '${catId}')">
                             <div class="cat-name">${app.title}</div>
-                            ${osHeadersHtml}
                         </div>
                         <div class="cat-content">
                             ${itemsHtml}
@@ -1983,13 +1979,38 @@
 
         const app = rawData[id];
         mainArea.style.setProperty('--current-color', app.color);
+        
+        const isWinOnly = ['np', 'tc', 'pp'].includes(id);
+        const isSettings = ['ex', 'fg'].includes(id);
+        
+        let osHtml = '';
+        if (!isSettings) {
+            if (isWinOnly) {
+                osHtml = `<div class="os-switch static"><span class="os-btn active">WIN ONLY</span></div>`;
+            } else {
+                osHtml = `
+                    <div class="os-switch">
+                        <span class="os-btn ${currentOS === 'win' ? 'active' : ''}" onclick="setOS('win')">WIN</span>
+                        <span class="os-sep">/</span>
+                        <span class="os-btn ${currentOS === 'mac' ? 'active' : ''}" onclick="setOS('mac')">MAC</span>
+                    </div>
+                `;
+            }
+        }
+
         let metaText = app.meta ? (currentLang === 'ru' ? app.meta[0] : app.meta[1]) : '';
         let metaHtml = metaText ? `<span class="header-meta">${metaText}</span>` : '';
-        titleEl.innerHTML = `<div class="header-title">>_ ${app.title}</div>${metaHtml}`;
+        
+        titleEl.innerHTML = `
+            <div class="header-left">
+                <div class="header-title">>_ ${app.title}</div>
+                ${osHtml}
+            </div>
+            ${metaHtml}
+        `;
         
         const colsCount = createGridCols();
         let colIndex = 0;
-        const showHeaders = dualOsApps.includes(id);
 
         if(app.data) {
             app.data.forEach(cat => {
@@ -1999,7 +2020,7 @@
                     itemsHtml += buildItem(id, cat[1], item[0], item[1], item[2], item[3]);
                 });
                 const catId = `${id}|${cat[1]}`;
-                const catHtml = buildCategoryHTML(catId, displayCat, itemsHtml, showHeaders);
+                const catHtml = buildCategoryHTML(catId, displayCat, itemsHtml);
                 document.getElementById(`col-${colIndex}`).innerHTML += catHtml;
                 colIndex = (colIndex + 1) % colsCount;
             });
