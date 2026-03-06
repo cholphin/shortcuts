@@ -65,19 +65,18 @@
             border-right: 1px solid var(--border-dim);
             display: flex;
             flex-direction: column;
-            padding: 15px 15px 60px 15px; 
+            padding: 11px 15px 60px 15px; 
             z-index: 10;
             transition: background-color 0.3s, border-color 0.3s;
         }
 
-        /* ИДЕАЛЬНАЯ ГЕОМЕТРИЯ ШАПКИ САЙДБАРА */
         .brand-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
+            align-items: baseline;
             height: 16px;
             margin-bottom: 15px; 
-            padding: 0 11px 0 5px; /* Синхрон с search-box */
+            padding: 0 11px 0 5px; 
         }
 
         .brand {
@@ -96,15 +95,18 @@
             line-height: 16px;
             letter-spacing: 1px;
             color: var(--text-base);
+            margin-right: -1px;
         }
 
         .lang-btn { cursor: pointer; transition: color 0.2s; }
         .lang-btn:hover, .lang-btn.active { color: var(--text-main); }
         .lang-sep { opacity: 0.4; cursor: default; }
 
-        .search-box { margin-bottom: 16px; padding: 0 11px 0 5px; }
+        .search-box { margin-bottom: 15px; padding: 0 11px 0 5px; } 
         .search-input {
-            width: 100%; height: 34px; background: var(--bg-main);
+            width: 100%; 
+            height: 32px; 
+            background: var(--bg-main);
             border: 1px solid var(--border-dim); color: var(--text-main);
             padding: 0 10px; border-radius: 6px; font-family: inherit;
             font-size: 11px; outline: none; transition: border-color 0.2s;
@@ -115,7 +117,8 @@
         .nav-list { flex: 1; overflow-y: scroll; overflow-x: hidden; display: flex; flex-direction: column; gap: 2px; padding: 0 5px; }
         .nav-btn {
             background: transparent; border: 1px solid transparent; color: var(--text-base);
-            padding: 6px 10px; border-radius: 6px; cursor: pointer;
+            height: 32px; 
+            padding: 0 10px; border-radius: 6px; cursor: pointer;
             transition: background 0.2s, color 0.2s, border-color 0.2s;
             display: flex; align-items: center; font-family: inherit;
             font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
@@ -125,7 +128,14 @@
         .nav-left { display: flex; align-items: center; gap: 10px; }
         .nav-left > span { position: relative; top: -1px; }
         
-        .logo-box { font-weight: normal; font-size: 11px; letter-spacing: 0; color: inherit; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; line-height: 1; border: 1px solid currentColor; border-radius: 4px; transition: opacity 0.2s; opacity: 0.8; }
+        .logo-box { 
+            font-weight: normal; font-size: 11px; letter-spacing: 0; color: inherit; 
+            width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; 
+            line-height: 1; border: 1px solid currentColor; border-radius: 4px; transition: opacity 0.2s; opacity: 0.8; 
+            padding-bottom: 2px; 
+            box-sizing: border-box;
+            transform: translateY(-1px); 
+        }
         .nav-btn:hover .logo-box, .nav-btn.active .logo-box { opacity: 1; }
 
         .sidebar-bottom { margin-top: auto; padding-top: 15px; display: flex; flex-direction: column; gap: 15px; }
@@ -141,94 +151,87 @@
         .theme-circle { width: 12px; height: 12px; background: var(--text-base); border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: transform 0.3s, background 0.3s; transform: translateX(18px); }
         [data-theme="light"] .theme-circle { transform: translateX(0px); }
 
-        .author-credit { align-self: center; text-align: center; font-size: 9px; color: var(--text-base); letter-spacing: 0.4px; text-transform: uppercase; opacity: 0.5; transition: opacity 0.3s, color 0.3s; user-select: none; text-decoration: none; line-height: 1; }
+        .author-credit { 
+            align-self: center; text-align: center; font-size: 9px; color: var(--text-base); 
+            letter-spacing: 0.4px; text-transform: uppercase; opacity: 0.5; transition: opacity 0.3s, color 0.3s; 
+            user-select: none; text-decoration: none; line-height: 1; 
+            transform: translateY(-1px); 
+        }
         .author-credit:hover { opacity: 1; color: var(--text-main); }
 
-        /* ИДЕАЛЬНОЕ ВЫРАВНИВАНИЕ КОНТЕНТА ПО "КРАСНЫМ ЛИНИЯМ" */
-        .main { flex: 1; padding: 15px 40px 30px 40px; overflow-y: scroll; position: relative; transition: background-color 0.3s; -webkit-overflow-scrolling: touch; }
+        /* ИДЕАЛЬНОЕ ВЫРАВНИВАНИЕ ПРАВОЙ ПАНЕЛИ */
+        .main { flex: 1; padding: 11px 30px 30px 30px; overflow-y: scroll; position: relative; transition: background-color 0.3s; -webkit-overflow-scrolling: touch; }
         
         .header { 
-            display: flex; justify-content: space-between; align-items: flex-start; 
-            height: 31px; /* 15px padding_top + 31px = 46px (точно совпадает с верхом окна поиска) */
-            margin-bottom: 20px; 
-            border-bottom: 1px solid var(--border-dim); 
-            box-sizing: border-box; transition: border-color 0.3s; 
+            position: relative;
+            display: block; 
+            height: 16px; 
+            margin-bottom: 15px; 
+            padding-bottom: 0;
+            border-bottom: none; 
+            box-sizing: border-box; 
         }
         
         .header-left { 
-            display: flex; align-items: center; gap: 20px; 
-            height: 16px; /* Жесткая привязка к высоте текста SOFTWARE */
+            position: absolute;
+            top: 0; left: 0; 
+            display: flex; align-items: baseline; gap: 20px; 
+            height: 16px; 
         }
         
         .header-title { font-size: 16px; line-height: 16px; font-weight: normal; color: var(--current-color); text-transform: uppercase; letter-spacing: 1px; }
         
         .os-switch { font-size: 16px; line-height: 16px; letter-spacing: 1px; color: var(--current-color); display: flex; gap: 6px; }
         .os-btn { cursor: pointer; opacity: 0.4; transition: opacity 0.2s; }
-        .os-btn.active { opacity: 1; }
+        .os-btn:hover, .os-btn.active { opacity: 1; } /* Фикс: hover-эффект для кнопок ОС */
         .os-switch.static .os-btn { opacity: 1; cursor: default; }
         .os-sep { opacity: 0.4; cursor: default; }
 
-        .header-meta { align-self: flex-end; margin-bottom: 6px; }
-        .header-meta, .header-meta a { font-size: 9px; color: var(--text-base); letter-spacing: 0.4px; text-transform: uppercase; text-decoration: none; opacity: 0.8; transition: opacity 0.2s, color 0.2s; font-weight: normal; text-align: right; }
+        .header-meta { 
+            position: absolute;
+            top: 16px; /* Фикс: Поднято на 2px (ровно под границу 16px заголовка) */
+            left: 0;   
+            font-size: 10px; 
+            color: var(--text-base); letter-spacing: 0.5px; text-transform: uppercase; text-decoration: none; opacity: 0.8; transition: opacity 0.2s, color 0.2s; font-weight: normal; text-align: left; 
+            white-space: nowrap;
+        }
+        .header-meta a { color: inherit; text-decoration: none; transition: color 0.2s; }
         .header-meta a:hover { color: var(--text-main); opacity: 1; }
 
-        .grid { display: flex; gap: 20px; align-items: flex-start; width: 100%; }
-        .grid-col { flex: 1; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+        .grid { display: flex; gap: 15px; align-items: flex-start; width: 100%; } 
+        .grid-col { flex: 1; display: flex; flex-direction: column; gap: 15px; min-width: 0; } 
 
         .category { background: var(--bg-card); border: 1px solid var(--current-color); border-radius: 6px; transition: background-color 0.3s; overflow: hidden; margin-bottom: 0; min-width: 0; }
-
-        .cat-title {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 14px;
-            font-weight: normal; color: var(--current-color); border-bottom: 1px solid var(--border-dim);
-            background: var(--active-bg); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px;
-            cursor: pointer; user-select: none; position: relative;
-            min-width: 0;
-        }
-        .cat-name { 
-            flex: 1; padding-right: 20px; 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            min-width: 0;
-        }
         
-        .cat-title::after {
-            content: ''; position: absolute; right: 14px; top: 50%; margin-top: -3px;
-            width: 6px; height: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor;
-            transform: rotate(45deg); transition: transform 0.3s ease;
+        .cat-title { 
+            display: flex; align-items: center; justify-content: space-between; 
+            height: 32px; padding: 0 14px; 
+            font-weight: normal; color: var(--current-color); border-bottom: 1px solid var(--border-dim); 
+            background: var(--active-bg); text-transform: uppercase; font-size: 11px; letter-spacing: 1px; 
+            cursor: pointer; user-select: none; position: relative; min-width: 0; 
         }
+        .cat-name { flex: 1; padding-right: 20px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+        .cat-title::after { content: ''; position: absolute; right: 14px; top: 50%; margin-top: -3px; width: 6px; height: 6px; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform 0.3s ease; }
         .category.collapsed .cat-title::after { transform: rotate(-45deg); }
         .category.collapsed .cat-content { display: none; }
 
-        .item {
-            position: relative; display: flex; align-items: center; justify-content: space-between;
-            padding: 8px 14px; border-bottom: 1px solid var(--border-dim); transition: background 0.2s;
-            min-width: 0;
+        .item { 
+            position: relative; display: flex; align-items: center; justify-content: space-between; 
+            height: 32px; padding: 0 14px; 
+            border-bottom: 1px solid var(--border-dim); transition: background 0.2s; min-width: 0; 
         }
         .item:hover { background: var(--item-hover); }
         .item:last-child { border-bottom: none; }
         .item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px; background-color: var(--current-color); opacity: 0; transition: opacity 0.2s; }
         .item:hover::before { opacity: 1; }
 
-        .item-desc { 
-            flex: 1; padding-right: 15px; color: var(--text-main); 
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            min-width: 0;
-        }
-        
+        .item-desc { flex: 1; padding-right: 15px; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
         .item-shortcuts { display: flex; gap: 8px; flex-shrink: 0; }
-        .item-keys {
-            width: var(--btn-width); color: var(--text-main); background: var(--key-bg); border: 1px solid var(--border-dim);
-            padding: 4px 6px; border-radius: 4px; font-weight: normal; white-space: nowrap; font-size: 10px;
-            cursor: pointer; transition: color 0.2s, border-color 0.2s; display: flex; align-items: center; justify-content: center;
-        }
+        .item-keys { width: var(--btn-width); height: 20px; color: var(--text-main); background: var(--key-bg); border: 1px solid var(--border-dim); padding: 0 6px; border-radius: 4px; font-weight: normal; white-space: nowrap; font-size: 10px; cursor: pointer; transition: color 0.2s, border-color 0.2s; display: flex; align-items: center; justify-content: center; }
         .item-keys:hover { border-color: var(--current-color); color: var(--current-color); }
-        
         .setting-val { width: auto; min-width: var(--btn-width); background: transparent; font-size: 11px; }
 
-        .fav {
-            width: 20px; flex-shrink: 0; background: none; border: none; color: var(--border-dim); cursor: pointer;
-            font-size: 15px; text-align: right; line-height: 1; transition: color 0.2s; position: relative; z-index: 2; margin-left: 8px;
-        }
+        .fav { width: 20px; flex-shrink: 0; background: none; border: none; color: var(--border-dim); cursor: pointer; font-size: 15px; text-align: right; line-height: 1; transition: color 0.2s; position: relative; z-index: 2; margin-left: 8px; }
         .fav:hover { color: var(--text-main); }
         .fav.active { color: var(--current-color); }
 
@@ -260,17 +263,17 @@
         @media (max-width: 1024px) {
             body { flex-direction: column; }
             .sidebar { width: 100%; padding: 15px; border-right: none; border-bottom: 1px solid var(--border-dim); flex: none; }
-            .brand-header { margin-bottom: 15px; padding: 0; }
+            .brand-header { margin-bottom: 15px; padding: 0; justify-content: space-between; }
             .search-box { margin-bottom: 15px; padding: 0; }
             .nav-list { flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 0 0 5px 0; margin-bottom: 0; }
             .nav-btn { flex: 0 0 auto; padding: 8px 14px; }
             .sidebar-bottom { flex-direction: row; justify-content: space-between; align-items: center; padding: 15px 0 0 0; margin-top: 10px; border-top: 1px solid var(--border-dim); }
             .theme-switch-wrapper { border: none; padding: 0; margin: 0; }
-            .author-credit { margin: 0; }
+            .author-credit { margin: 0; transform: none; }
             .main { padding: 15px; }
-            .header { height: auto; flex-direction: column; align-items: flex-start; gap: 8px; padding-bottom: 10px; margin-bottom: 15px; }
-            .header-left { flex-direction: column; gap: 8px; height: auto; }
-            .header-meta { text-align: left; align-self: flex-start; margin-bottom: 0; }
+            .header { height: auto; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; margin-bottom: 15px; border-bottom: 1px solid var(--border-dim); padding-bottom: 10px; }
+            .header-left { position: relative; top: auto; left: auto; display: flex; flex-direction: column; gap: 8px; height: auto; align-items: flex-start; }
+            .header-meta { position: relative; top: auto; left: auto; text-align: left; align-self: flex-start; white-space: normal; }
             .grid { flex-direction: column; align-items: stretch; gap: 15px; }
             .grid-col { width: 100%; }
             .category { width: 100%; }
@@ -358,6 +361,8 @@
         btn.classList.add('active');
         ui.querySelector('.' + tabClass).classList.add('active');
     }
+
+    const dualOsApps = ['tg', 'cb', 'gd', 'gs', 'wn', 'pr', 'da', 'cc', 'au', 'ae', 'ps', 'bl', 'yt'];
 
     // DATA FORMAT: [ "Category RU", "Category EN", [ ["Desc RU", "Desc EN", "Win", "Mac"] ] ]
     const rawData = {
@@ -1843,7 +1848,7 @@
         
         titleEl.innerHTML = `
             <div class="header-left">
-                <div class="header-title">>_ ${currentLang === 'ru' ? 'ПОИСК:' : 'SEARCH:'} ${query.toUpperCase()}</div>
+                <div class="header-title">${currentLang === 'ru' ? 'ПОИСК:' : 'SEARCH:'} ${query.toUpperCase()}</div>
                 ${osHtml}
             </div>
         `;
@@ -1887,6 +1892,7 @@
                 const catId = `search|${appId}`;
                 const isCollapsed = collapsedStates.includes(catId);
                 const collapsedClass = isCollapsed ? 'collapsed' : '';
+                
                 const catHtml = `
                 <div class="category ${collapsedClass}" style="--current-color: ${app.color}; border-color: ${app.color};">
                     <div class="cat-title" style="color: ${app.color};" onclick="toggleCategory(this, '${catId}')">
@@ -1911,6 +1917,7 @@
 
         if (id === 'fav') {
             mainArea.style.setProperty('--current-color', '#ca8a04');
+            const metaStr = currentLang === 'ru' ? 'ОТМЕЧАЙТЕ НУЖНЫЕ КОМАНДЫ ЗВЕЗДОЧКОЙ' : 'MARK YOUR WORKFLOW SHORTCUTS';
             let osHtml = `
                 <div class="os-switch">
                     <span class="os-btn ${currentOS === 'win' ? 'active' : ''}" onclick="setOS('win')">WIN</span>
@@ -1921,9 +1928,10 @@
             
             titleEl.innerHTML = `
                 <div class="header-left">
-                    <div class="header-title">>_ ${currentLang === 'ru' ? 'ИЗБРАННОЕ' : 'FAVORITES'}</div>
+                    <div class="header-title">${currentLang === 'ru' ? 'ИЗБРАННОЕ' : 'FAVORITES'}</div>
                     ${osHtml}
                 </div>
+                <div class="header-meta">${metaStr}</div>
             `;
             
             if (!favorites.length) { document.getElementById('grid').innerHTML = ''; return; }
@@ -1999,11 +2007,11 @@
         }
 
         let metaText = app.meta ? (currentLang === 'ru' ? app.meta[0] : app.meta[1]) : '';
-        let metaHtml = metaText ? `<span class="header-meta">${metaText}</span>` : '';
+        let metaHtml = metaText ? `<div class="header-meta">${metaText}</div>` : '';
         
         titleEl.innerHTML = `
             <div class="header-left">
-                <div class="header-title">>_ ${app.title}</div>
+                <div class="header-title">${app.title}</div>
                 ${osHtml}
             </div>
             ${metaHtml}
