@@ -159,7 +159,6 @@
         }
         .author-credit:hover { opacity: 1; color: var(--text-main); }
 
-        /* ИДЕАЛЬНОЕ ВЫРАВНИВАНИЕ ПРАВОЙ ПАНЕЛИ */
         .main { flex: 1; padding: 11px 30px 30px 30px; overflow-y: scroll; position: relative; transition: background-color 0.3s; -webkit-overflow-scrolling: touch; }
         
         .header { 
@@ -183,13 +182,13 @@
         
         .os-switch { font-size: 16px; line-height: 16px; letter-spacing: 1px; color: var(--current-color); display: flex; gap: 6px; }
         .os-btn { cursor: pointer; opacity: 0.4; transition: opacity 0.2s; }
-        .os-btn:hover, .os-btn.active { opacity: 1; } /* Фикс: hover-эффект для кнопок ОС */
+        .os-btn:hover, .os-btn.active { opacity: 1; }
         .os-switch.static .os-btn { opacity: 1; cursor: default; }
         .os-sep { opacity: 0.4; cursor: default; }
 
         .header-meta { 
             position: absolute;
-            top: 16px; /* Фикс: Поднято на 2px (ровно под границу 16px заголовка) */
+            top: 16px; 
             left: 0;   
             font-size: 10px; 
             color: var(--text-base); letter-spacing: 0.5px; text-transform: uppercase; text-decoration: none; opacity: 0.8; transition: opacity 0.2s, color 0.2s; font-weight: normal; text-align: left; 
@@ -235,7 +234,7 @@
         .fav:hover { color: var(--text-main); }
         .fav.active { color: var(--current-color); }
 
-        /* ИНТЕРФЕЙС ЭКСПОРТА */
+        /* ИНТЕРФЕЙС ЭКСПОРТА И ВНЕШНИЕ ТАБЫ */
         .dvr-ui { padding: 14px; font-family: inherit; }
         .dvr-top { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border-dim); justify-content: center; }
         .dvr-tabs { display: flex; gap: 8px; margin-bottom: 15px; }
@@ -258,6 +257,20 @@
         .dvr-ctrl input[type="radio"]:checked::after { width: 6px; height: 6px; border-radius: 50%; }
         .dvr-ctrl input[type="checkbox"]:checked::after { width: 6px; height: 6px; border-radius: 1px; }
         .dvr-ctrl.disabled { opacity: 0.5; }
+
+        /* ИНТЕРАКТИВНАЯ МАШИНА STORY ARCHITECT */
+        .sa-machine { padding: 14px; display: flex; flex-direction: column; gap: 4px; }
+        .sa-scroll-wrap { overflow-x: auto; padding-bottom: 5px; }
+        .sa-grid { min-width: 400px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+        .sa-btn { height: 32px; border: 1px solid var(--border-dim); background: var(--key-bg); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text-main); cursor: pointer; transition: all 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px; user-select: none; }
+        .sa-btn.sa-head { background: transparent; border-color: transparent; color: var(--text-base); font-size: 10px; cursor: default; }
+        .sa-btn.sa-head.sa-action { border-color: var(--border-dim); cursor: pointer; }
+        .sa-btn.sa-head.sa-action:hover { border-color: var(--current-color); color: var(--text-main); background: var(--item-hover); }
+        .sa-row { display: contents; } 
+        .sa-row:not(.active) .sa-btn:not(.sa-head) { opacity: 0.4; }
+        .sa-row:not(.active):hover .sa-btn:not(.sa-head) { opacity: 1; }
+        .sa-row.active .sa-btn-primary { background: var(--current-color); border-color: var(--current-color); color: var(--bg-main); font-weight: bold; opacity: 1; }
+        .sa-btn:hover:not(.sa-head):not(.sa-btn-primary) { border-color: var(--current-color); color: var(--current-color); }
 
         /* --- МОБИЛЬНАЯ АДАПТАЦИЯ --- */
         @media (max-width: 1024px) {
@@ -362,368 +375,398 @@
         ui.querySelector('.' + tabClass).classList.add('active');
     }
 
-    const dualOsApps = ['tg', 'cb', 'gd', 'gs', 'wn', 'pr', 'da', 'cc', 'au', 'ae', 'ps', 'bl', 'yt'];
+    /* БАЗА ДАННЫХ ИНТЕРАКТИВНОЙ МАШИНЫ STORY ARCHITECT */
+    const saLogicDB = {
+        text: {
+            keys: ['h1','h2','h3','h4','h5','h6','txt','note'],
+            ru: ['H1','H2','H3','H4','H5','H6','Текст','Заметка'],
+            en: ['H1','H2','H3','H4','H5','H6','Text','Note'],
+            flow: {
+                'h1': ['h2','txt','h2','h1'], 'h2': ['h3','txt','h3','h1'], 'h3': ['h4','txt','h4','h2'],
+                'h4': ['h5','txt','h5','h3'], 'h5': ['h6','txt','h6','h4'], 'h6': ['txt','txt','txt','h5'],
+                'txt': ['txt','txt','note','h6'], 'note': ['txt','txt','txt','note']
+            }
+        },
+        screenplay: {
+            keys: ['head','char_list','beat','action','char','paren','dial','lyric','shot','trans','note','ptxt','group','act'],
+            ru: ['Сцена','Участники','Бит','Действие','Персонаж','Ремарка','Реплика','Лирика','Кадр','Переход','Заметка','Пр. текст','Группа','Акт'],
+            en: ['Scene','Char List','Beat','Action','Character','Paren','Dialogue','Lyric','Shot','Trans','Note','Text','Group','Act'],
+            flow: {
+                'head': ['char_list','action','action','head'], 'char_list': ['action','action','action','action'],
+                'beat': ['action','action','action','action'], 'action': ['char','action','char','head'],
+                'char': ['paren','dial','action','action'], 'paren': ['dial','dial','dial','paren'],
+                'dial': ['paren','action','paren','action'], 'lyric': ['paren','action','paren','action'],
+                'shot': ['action','action','action','shot'], 'trans': ['head','head','action','trans'],
+                'note': ['action','action','note','note'], 'ptxt': ['ptxt','ptxt','ptxt','ptxt'],
+                'group': ['head','head','head','act'], 'act': ['group','head','group','act']
+            }
+        },
+        comic: {
+            keys: ['page','panel','desc','char','dial','note','ptxt'],
+            ru: ['Страница','Кадр','Описание','Персонаж','Реплика','Заметка','Пр. текст'],
+            en: ['Page','Panel','Desc','Character','Dialogue','Note','Text'],
+            flow: {
+                'page': ['panel','panel','panel','page'], 'panel': ['char','desc','desc','page'],
+                'desc': ['char','desc','char','panel'], 'char': ['dial','dial','desc','desc'],
+                'dial': ['char','desc','char','desc'], 'note': ['desc','desc','note','note'],
+                'ptxt': ['ptxt','ptxt','ptxt','ptxt']
+            }
+        },
+        audio: {
+            keys: ['head','char','dial','sound','music','cue','note','ptxt'],
+            ru: ['Сцена','Персонаж','Реплика','Звук','Музыка','Сигнал','Заметка','Пр. текст'],
+            en: ['Scene','Character','Dialogue','Sound','Music','Cue','Note','Text'],
+            flow: {
+                'head': ['cue','char','char','char'], 'char': ['dial','dial','sound','head'],
+                'dial': ['cue','char','sound','head'], 'sound': ['music','char','music','head'],
+                'music': ['sound','char','cue','head'], 'cue': ['head','char','char','head'],
+                'note': ['char','char','char','char'], 'ptxt': ['ptxt','ptxt','char','char']
+            }
+        },
+        play: {
+            keys: ['head','char','paren','dial','action','note','ptxt'],
+            ru: ['Сцена','Персонаж','Ремарка','Реплика','Действие','Заметка','Пр. текст'],
+            en: ['Scene','Character','Paren','Dialogue','Action','Note','Text'],
+            flow: {
+                'head': ['action','char','char','char'], 'char': ['paren','dial','action','head'],
+                'paren': ['dial','dial','dial','dial'], 'dial': ['paren','char','action','head'],
+                'action': ['head','char','char','char'], 'note': ['char','char','char','char'],
+                'ptxt': ['ptxt','ptxt','char','char']
+            }
+        },
+        novel: {
+            keys: ['head','beat','txt','note','ptxt','chap','part'],
+            ru: ['Сцена','Бит','Текст','Заметка','Пр. текст','Глава','Часть'],
+            en: ['Scene','Beat','Text','Note','P. Text','Chapter','Part'],
+            flow: {
+                'head': ['txt','txt','txt','chap'], 'beat': ['txt','txt','txt','txt'],
+                'txt': ['txt','txt','txt','head'], 'note': ['txt','txt','note','note'],
+                'ptxt': ['ptxt','ptxt','ptxt','ptxt'], 'chap': ['head','head','head','part'], 
+                'part': ['chap','head','chap','part']
+            }
+        }
+    };
 
-    // DATA FORMAT: [ "Category RU", "Category EN", [ ["Desc RU", "Desc EN", "Win", "Mac"] ] ]
+    let activeSATab = 'text';
+    let activeSAStates = { text: 'h1', screenplay: 'head', comic: 'page', audio: 'head', play: 'head', novel: 'head' };
+
+    function switchSATab(btn, tabId) {
+        const ui = btn.closest('.dvr-ui');
+        ui.querySelectorAll('.dvr-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        activeSATab = tabId;
+        renderSAMachine();
+    }
+
+    function saAction(actionIdx) {
+        const currentState = activeSAStates[activeSATab];
+        const nextState = saLogicDB[activeSATab].flow[currentState][actionIdx];
+        activeSAStates[activeSATab] = nextState;
+        renderSAMachine();
+    }
+
+    function saSetState(stateKey) {
+        activeSAStates[activeSATab] = stateKey;
+        renderSAMachine();
+    }
+
+    function renderSAMachine() {
+        const root = document.getElementById('sa-machine-root');
+        if (!root) return;
+
+        const db = saLogicDB[activeSATab];
+        const langArr = currentLang === 'ru' ? db.ru : db.en;
+        const currentState = activeSAStates[activeSATab];
+        const enterKeyText = currentOS === 'mac' ? 'RETURN' : 'ENTER';
+        
+        let headerRow = '';
+        if (currentLang === 'ru') {
+            headerRow = `<div class="sa-btn sa-head">ЭЛЕМЕНТ</div><div class="sa-btn sa-head sa-action" onclick="saAction(0)">⇥ текст</div><div class="sa-btn sa-head sa-action" onclick="saAction(1)">↵ текст</div><div class="sa-btn sa-head sa-action" onclick="saAction(2)">⇥ пусто</div><div class="sa-btn sa-head sa-action" onclick="saAction(3)">↵ пусто</div>`;
+        } else {
+            headerRow = `<div class="sa-btn sa-head">ELEMENT</div><div class="sa-btn sa-head sa-action" onclick="saAction(0)">⇥ text</div><div class="sa-btn sa-head sa-action" onclick="saAction(1)">↵ text</div><div class="sa-btn sa-head sa-action" onclick="saAction(2)">⇥ empty</div><div class="sa-btn sa-head sa-action" onclick="saAction(3)">↵ empty</div>`;
+        }
+
+        let rowsHtml = '';
+        db.keys.forEach((key, idx) => {
+            const isActive = key === currentState ? 'active' : '';
+            const primaryName = langArr[idx];
+            
+            const target0Name = langArr[db.keys.indexOf(db.flow[key][0])];
+            const target1Name = langArr[db.keys.indexOf(db.flow[key][1])];
+            const target2Name = langArr[db.keys.indexOf(db.flow[key][2])];
+            const target3Name = langArr[db.keys.indexOf(db.flow[key][3])];
+
+            rowsHtml += `
+                <div class="sa-row ${isActive}">
+                    <div class="sa-btn sa-btn-primary" onclick="saSetState('${key}')">${primaryName}</div>
+                    <div class="sa-btn" onclick="saSetState('${db.flow[key][0]}')">${target0Name}</div>
+                    <div class="sa-btn" onclick="saSetState('${db.flow[key][1]}')">${target1Name}</div>
+                    <div class="sa-btn" onclick="saSetState('${db.flow[key][2]}')">${target2Name}</div>
+                    <div class="sa-btn" onclick="saSetState('${db.flow[key][3]}')">${target3Name}</div>
+                </div>
+            `;
+        });
+
+        const tabText = currentLang === 'ru' ? ['ТЕКСТ', 'СЦЕНАРИЙ', 'КОМИКС', 'АУДИО', 'ПЬЕСА', 'РОМАН'] : ['TEXT', 'SCREENPLAY', 'COMIC', 'AUDIO', 'PLAY', 'NOVEL'];
+
+        root.innerHTML = `
+            <div class="dvr-ui" style="padding-bottom: 5px;">
+                <div class="dvr-tabs" style="flex-wrap: wrap;">
+                    <div class="dvr-tab ${activeSATab === 'text' ? 'active' : ''}" onclick="switchSATab(this, 'text')">${tabText[0]}</div>
+                    <div class="dvr-tab ${activeSATab === 'screenplay' ? 'active' : ''}" onclick="switchSATab(this, 'screenplay')">${tabText[1]}</div>
+                    <div class="dvr-tab ${activeSATab === 'comic' ? 'active' : ''}" onclick="switchSATab(this, 'comic')">${tabText[2]}</div>
+                    <div class="dvr-tab ${activeSATab === 'audio' ? 'active' : ''}" onclick="switchSATab(this, 'audio')">${tabText[3]}</div>
+                    <div class="dvr-tab ${activeSATab === 'play' ? 'active' : ''}" onclick="switchSATab(this, 'play')">${tabText[4]}</div>
+                    <div class="dvr-tab ${activeSATab === 'novel' ? 'active' : ''}" onclick="switchSATab(this, 'novel')">${tabText[5]}</div>
+                </div>
+                <div class="sa-scroll-wrap">
+                    <div class="sa-grid">
+                        ${headerRow}
+                        ${rowsHtml}
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    const dualOsApps = ['ae', 'au', 'bl', 'cb', 'cc', 'da', 'gd', 'gs', 'pr', 'ps', 'sa', 'tg', 'yt'];
+
     const rawData = {
-        tg: { id: "tg", logo: "TG", title: "TELEGRAM", color: "#24a1de", meta: ["НАСТРОЙКИ > ГОРЯЧИЕ КЛАВИШИ", "SETTINGS > KEYBOARD SHORTCUTS"], data: [
-            ["Приложение", "Application", [
-                ["Закрытие окна", "Close Window", "Ctrl + W", "Cmd + W"],
-                ["Блокировка приложения", "Lock Telegram", "Ctrl + L", "Cmd + L"],
-                ["Сворачивание окна", "Minimize Window", "Ctrl + M", "Cmd + M"],
-                ["Выход из приложения", "Quit Telegram", "Ctrl + Q", "Cmd + Q"],
-                ["Полноэкранный режим видео", "Fullscreen Video", "Ctrl + `", "Cmd + `"]
+        ae: { id: "ae", logo: "AE", title: "ADOBE AFTER EFFECTS", color: "#c084fc", meta: ["<a href='https://helpx.adobe.com/ru/after-effects/using/keyboard-shortcuts-reference.html' target='_blank'>ГОРЯЧИЕ КЛАВИШИ ADOBE AFTER EFFECTS</a>", "<a href='https://helpx.adobe.com/en/after-effects/using/keyboard-shortcuts-reference.html' target='_blank'>ADOBE AFTER EFFECTS KEYBOARD SHORTCUTS</a>"], data: [
+            ["Свойства слоя", "Layer Properties", [
+                ["Position (Позиция)", "Position", "P", "P"],
+                ["Scale (Масштаб)", "Scale", "S", "S"],
+                ["Rotation (Вращение)", "Rotation", "R", "R"],
+                ["Opacity (Непрозрачн.)", "Opacity", "T", "T"],
+                ["Anchor Point (Якорная точка)", "Anchor Point", "A", "A"],
+                ["Свойства с ключами", "Reveal Keyframes", "U", "U"],
+                ["Измененные свойства", "Reveal Modified Props", "U U", "U U"],
+                ["Эффекты", "Effects", "E", "E"],
+                ["Форма маски (Mask Path)", "Mask Path", "M", "M"],
+                ["Все свойства маски", "All Mask Properties", "M M", "M M"],
+                ["Растушевка маски", "Mask Feather", "F", "F"],
+                ["Выражения (Expressions)", "Reveal Expressions", "E E", "E E"],
+                ["Уровень звука (Audio Levels)", "Audio Levels", "L", "L"],
+                ["Волна звука (Waveform)", "Audio Waveform", "L L", "L L"],
+                ["Добавить свойство", "Add Property to View", "Shift + Кнопка", "Shift + Key"]
             ]],
-            ["Навигация", "Navigation", [
-                ["Поиск сообщений", "Search Messages", "Ctrl + F", "Cmd + F"],
-                ["Предыдущий чат", "Previous Chat", "Alt + ↑", "Opt + ↑"],
-                ["Следующий чат", "Next Chat", "Alt + ↓", "Opt + ↓"],
-                ["Первый чат", "First Chat", "Ctrl + Alt + Home", "Cmd + Opt + ↑"],
-                ["Последний чат", "Last Chat", "Ctrl + Alt + End", "Cmd + Opt + ↓"],
-                ["Список контактов", "Contacts", "Ctrl + J", "Cmd + J"],
-                ["Архив чатов", "Archived Chats", "Ctrl + 9", "Cmd + 9"],
-                ["Переход в Настройки", "Open Settings", "Ctrl + ,", "Cmd + ,"]
+            ["Работа со слоями", "Layer Manipulation", [
+                ["Разрезать слой", "Split Layer", "Ctrl + Shift + D", "Cmd + Shift + D"],
+                ["Обрезать слой слева", "Trim In Point", "Alt + [", "Opt + ["],
+                ["Обрезать слой справа", "Trim Out Point", "Alt + ]", "Opt + ]"],
+                ["Сдвинуть начало к плейхеду", "Move In Point to CTI", "[", "["],
+                ["Сдвинуть конец к плейхеду", "Move Out Point to CTI", "]", "]"],
+                ["Сдвинуть слой на 1 кадр", "Nudge Layer 1 Frame", "Alt + PgUp / PgDn", "Opt + PgUp / PgDn"],
+                ["Сдвиг слоя на 10 кадров", "Nudge Layer 10 Frames", "Alt + Shift + PgUp/Dn", "Opt + Shift + PgUp/Dn"],
+                ["Слой выше / ниже", "Move Layer Up/Down", "Ctrl + [ / ]", "Cmd + [ / ]"],
+                ["Слой в самый верх/низ", "Move Layer Top/Bottom", "Ctrl + Shift + [ / ]", "Cmd + Shift + [ / ]"],
+                ["Дублировать слой", "Duplicate Layer", "Ctrl + D", "Cmd + D"],
+                ["Прекомпоз (Pre-comp)", "Pre-compose", "Ctrl + Shift + C", "Cmd + Shift + C"],
+                ["Замена слоя с атрибут.", "Replace Layer (Retain)", "Alt + Drag", "Opt + Drag"]
             ]],
-            ["Папки", "Folders", [
-                ["Избранное", "Saved Messages", "Ctrl + 0", "Cmd + 0"],
-                ["Папка «Все чаты»", "All Chats Folder", "Ctrl + 1", "Cmd + 1"],
-                ["Папка №1 - №6", "Folder 1 - 6", "Ctrl + 2 - 7", "Cmd + 2 - 7"],
-                ["Последняя папка", "Last Folder", "Ctrl + 8", "Cmd + 8"],
-                ["Следующая папка", "Next Folder", "Ctrl + Shift + ↓", "Cmd + Shift + ↓"],
-                ["Предыдущая папка", "Previous Folder", "Ctrl + Shift + ↑", "Cmd + Shift + ↑"]
+            ["Таймлайн и Навигация", "Timeline Navigation", [
+                ["К началу/концу слоя", "Go to In/Out Point", "I / O", "I / O"],
+                ["К пред./след. ключу", "Next/Prev Keyframe", "J / K", "J / K"],
+                ["Шаг на 1 кадр", "Move 1 Frame", "PgDn / PgUp", "PgDn / PgUp"],
+                ["Шаг на 10 кадров", "Move 10 Frames", "Shift + PgDn / PgUp", "Shift + PgDn / PgUp"],
+                ["Начало рабочей области", "Work Area In Point", "B", "B"],
+                ["Конец рабочей области", "Work Area Out Point", "N", "N"],
+                ["Центрировать плейхед", "Center at Playhead", "D", "D"],
+                ["Перейти к времени", "Go to Time", "Alt + Shift + J", "Opt + Shift + J"],
+                ["Маркер на слой", "Add Marker", "Num *", "Num *"],
+                ["Маркер с настройками", "Add Marker with Settings", "Alt + Num *", "Opt + Num *"],
+                ["Масштаб до кадров (Zoom)", "Zoom to Frame", ";", ";"],
+                ["Поиск по таймлайну", "Search Timeline", "Ctrl + F", "Cmd + F"]
             ]],
-            ["Чат и Сообщения", "Chat & Messaging", [
-                ["Автопрочтение чата", "Mark as Read", "Ctrl + R", "Cmd + R"],
-                ["Просмотр меню чата", "Chat Menu", "Ctrl + \\", "Cmd + \\"],
-                ["Предпросмотр чата", "Preview Chat", "Ctrl + ]", "Cmd + ]"],
-                ["Жирный текст", "Bold Text", "Ctrl + B", "Cmd + B"],
-                ["Курсивный текст", "Italic Text", "Ctrl + I", "Cmd + I"],
-                ["Моноширинный текст", "Monospace Text", "Ctrl + Shift + M", "Cmd + Shift + M"],
-                ["Зачеркнутый текст", "Strikethrough", "Ctrl + Shift + X", "Cmd + Shift + X"],
-                ["Скрытый текст (Спойлер)", "Spoiler Text", "Ctrl + Shift + P", "Cmd + Shift + P"],
-                ["Добавить ссылку", "Insert Link", "Ctrl + K", "Cmd + K"]
+            ["Ключи и Анимация", "Keyframes & Animation", [
+                ["Плавный старт/стоп", "Easy Ease", "F9", "F9"],
+                ["Плавный вход (Ease In)", "Easy Ease In", "Shift + F9", "Shift + F9"],
+                ["Плавный выход (Ease Out)", "Easy Ease Out", "Ctrl + Shift + F9", "Cmd + Shift + F9"],
+                ["Редактор графиков", "Graph Editor", "Shift + F3", "Shift + F3"],
+                ["Добавить выражение", "Add Expression", "Alt + Клик (Часы)", "Opt + Click (Watch)"],
+                ["Интерполяция ключей", "Keyframe Interpolation", "Ctrl + Alt + K", "Cmd + Opt + K"],
+                ["Копировать связи", "Copy Expression Links", "Ctrl + Alt + C", "Cmd + Opt + C"]
+            ]],
+            ["Инструменты", "Tools", [
+                ["Курсор (Selection)", "Selection Tool", "V", "V"],
+                ["Рука (Hand Tool)", "Hand Tool", "H / Space", "H / Space"],
+                ["Вращение (Rotation)", "Rotation Tool", "W", "W"],
+                ["Якорная точка (Pan Behind)", "Pan Behind Tool", "Y", "Y"],
+                ["Шейпы и Маски", "Shape / Mask Tool", "Q", "Q"],
+                ["Перо (Pen Tool)", "Pen Tool", "G", "G"],
+                ["Камера (Camera Tool)", "Camera Tool", "C", "C"],
+                ["Текст (Type Tool)", "Type Tool", "Ctrl + T", "Cmd + T"],
+                ["Кисть ротоскопинга (Roto)", "Roto Brush", "Alt + W", "Opt + W"],
+                ["Марионеточная деформ.", "Puppet Pin Tool", "Ctrl + P", "Cmd + P"]
+            ]],
+            ["Подгонка и Центрирование", "Fit & Centering", [
+                ["Якорь в центр слоя", "Anchor Point to Center", "Ctrl + Alt + Home", "Cmd + Opt + Home"],
+                ["Слой в центр композа", "Layer to Center", "Ctrl + Home", "Cmd + Home"],
+                ["Слой под размер", "Fit to Comp", "Ctrl + Alt + F", "Cmd + Opt + F"],
+                ["Подогнать под ширину", "Fit to Comp Width", "Ctrl + Alt + Shift + H", "Cmd + Opt + Shift + H"],
+                ["Подогнать под высоту", "Fit to Comp Height", "Ctrl + Alt + Shift + G", "Cmd + Opt + Shift + G"]
+            ]],
+            ["Рендер и UI", "Render & UI", [
+                ["Настройки композиции", "Composition Settings", "Ctrl + K", "Cmd + K"],
+                ["Скрыть всё кроме превью", "Hide Panels", "Ctrl + \\", "Cmd + \\"],
+                ["Панель на весь экран", "Maximize Panel", "~", "~"],
+                ["Блок рендера (Refresh)", "Disable Rendering", "Caps Lock", "Caps Lock"],
+                ["RAM Preview", "RAM Preview", "Num 0", "Num 0"],
+                ["Очистить кэш (Purge)", "Purge All Memory", "Ctrl + Alt + Num 0", "Cmd + Opt + Num 0"],
+                ["Добавить в очередь рендера", "Add to Render Queue", "Ctrl + M", "Cmd + M"],
+                ["Рендер в Media Encoder", "Add to Media Encoder", "Ctrl + Alt + M", "Cmd + Opt + M"],
+                ["Сохранить текущий кадр", "Save Frame As", "Ctrl + Alt + S", "Cmd + Opt + S"],
+                ["Мини-схема (Mini Flowchart)", "Mini Flowchart", "Tab", "Tab"]
             ]]
         ]},
-        cb: { id: "cb", logo: "CB", title: "CENT BROWSER", color: "#1d4ed8", meta: ["<a href='https://support.google.com/chrome/answer/157179' target='_blank'>ГОРЯЧИЕ КЛАВИШИ CHROME</a>", "<a href='https://support.google.com/chrome/answer/157179' target='_blank'>CHROME KEYBOARD SHORTCUTS</a>"], data: [
-            ["Вкладки и навигация", "Tabs & Navigation", [
-                ["Новая вкладка", "New Tab", "Ctrl + T", "Cmd + T"],
-                ["Новое окно", "New Window", "Ctrl + N", "Cmd + N"],
-                ["Новое окно Инкогнито", "New Incognito Window", "Ctrl + Shift + N", "Cmd + Shift + N"],
-                ["Мультилогин вкладка", "Multi-login Tab", "Ctrl + M", "Cmd + M"],
-                ["На вкладку слева", "Previous Tab", "Ctrl + Shift + Tab", "Cmd + Opt + ←"],
-                ["На вкладку справа", "Next Tab", "Ctrl + Tab", "Cmd + Opt + →"],
-                ["Закрыть текущую вкладку", "Close Tab", "Ctrl + W", "Cmd + W"],
-                ["Открыть закрытую вкладку", "Reopen Closed Tab", "Ctrl + Shift + T", "Cmd + Shift + T"],
-                ["Дублировать вкладку", "Duplicate Tab", "Alt + U", "Opt + U"],
-                ["Закрепить / Открепить", "Pin / Unpin Tab", "Alt + N", "Opt + N"],
-                ["Вкл / Откл звук вкладки", "Mute / Unmute Tab", "Alt + M", "Opt + M"],
-                ["На первую вкладку", "First Tab", "Ctrl + 1", "Cmd + 1"],
-                ["На последнюю вкладку", "Last Tab", "Ctrl + 9", "Cmd + 9"],
-                ["Предыдущая страница", "Back (History)", "Alt + ←", "Cmd + ["],
-                ["Следующая страница", "Forward (History)", "Alt + →", "Cmd + ]"]
+        au: { id: "au", logo: "AU", title: "ADOBE AUDITION", color: "#0f766e", meta: ["<a href='https://helpx.adobe.com/ru/audition/using/default-keyboard-shortcuts.html' target='_blank'>ГОРЯЧИЕ КЛАВИШИ ADOBE AUDITION</a>", "<a href='https://helpx.adobe.com/en/audition/using/default-keyboard-shortcuts.html' target='_blank'>ADOBE AUDITION KEYBOARD SHORTCUTS</a>"], data: [
+            ["Навигация и Зум", "Navigation & Zoom", [
+                ["Waveform / Multitrack", "Waveform / Multitrack", "1", "1"],
+                ["Включить Waveform", "Switch to Waveform", "9", "9"],
+                ["Включить Multitrack", "Switch to Multitrack", "0", "0"],
+                ["Уместить проект", "Zoom Out Full", "\\", "\\"],
+                ["Масштаб по горизонтали", "Zoom In Horizontally", "=", "="],
+                ["Масштаб по вертикали", "Zoom In Vertically", "Alt + =", "Opt + ="],
+                ["К началу / концу проекта", "Go to Start / End", "Home / End", "Home / End"],
+                ["Возврат плейхеда (Стоп)", "Return Playhead on Stop", "Shift + X", "Shift + X"]
             ]],
-            ["Данные страницы", "Page Data", [
-                ["Перезагрузить", "Reload Page", "F5", "Cmd + R"],
-                ["Жесткая перезагрузка", "Hard Reload", "Ctrl + F5", "Cmd + Shift + R"],
-                ["Очистка кэша/данных", "Clear Browsing Data", "Ctrl + Shift + Del", "Cmd + Shift + Bksp"],
-                ["Копировать URL", "Copy URL", "Alt + C", "Cmd + L, Cmd + C"],
-                ["Копировать URL и Title", "Copy URL and Title", "Alt + L", "Opt + L"],
-                ["Открыть URL из буфера", "Open URL from Clipboard", "Alt + T", "Opt + T"],
-                ["Переключить курсор (Caret)", "Toggle Caret Browsing", "F7", "F7"],
-                ["Увеличить масштаб", "Zoom In", "Ctrl + +", "Cmd + +"],
-                ["Уменьшить масштаб", "Zoom Out", "Ctrl + -", "Cmd + -"],
-                ["Сбросить масштаб", "Reset Zoom", "Ctrl + 0", "Cmd + 0"],
-                ["К адресной строке", "Focus Address Bar", "Alt + D", "Cmd + L"],
-                ["В закладки", "Bookmark Page", "Ctrl + D", "Cmd + D"],
-                ["Все вкладки в закладки", "Bookmark All Tabs", "Ctrl + Shift + D", "Cmd + Shift + D"]
+            ["Инструменты", "Tools", [
+                ["Выделение времени", "Time Selection", "T", "T"],
+                ["Перемещение (Move)", "Move Tool", "V", "V"],
+                ["Лезвие (Razor)", "Razor Tool", "R", "R"],
+                ["Прокрутка клипа (Slip)", "Slip Tool", "Y", "Y"],
+                ["Восстанавливающая кисть", "Spot Healing Brush", "A", "A"],
+                ["Выделение области", "Marquee Selection", "E", "E"],
+                ["Кисть (Paintbrush)", "Paintbrush Tool", "B", "B"]
             ]],
-            ["Инструменты и панели", "Tools & Panels", [
-                ["Показать меню закладок", "Bookmarks Menu", "Alt + B", "Opt + B"],
-                ["Вкл / Выкл панель закладок", "Toggle Bookmarks Bar", "Ctrl + Shift + B", "Cmd + Shift + B"],
-                ["Открыть страницу в IE", "Open Page in IE", "Ctrl + Shift + E", "Cmd + Shift + E"],
-                ["Сохранить страницу как...", "Save Page As...", "Ctrl + S", "Cmd + S"],
-                ["Сохранить как изображение", "Save Page as Image", "Alt + I", "Opt + I"],
-                ["Скриншот всей страницы", "Screenshot Full Page", "Alt + Shift + I", "Opt + Shift + I"],
-                ["Полноэкранный режим", "Toggle Fullscreen", "F11", "Cmd + Ctrl + F"],
-                ["Настройки", "Settings", "Alt + S", "Cmd + ,"],
-                ["Загрузки", "Downloads", "Ctrl + J", "Cmd + Shift + J"],
-                ["История", "History", "Ctrl + H", "Cmd + Y"],
-                ["Диспетчер задач Chrome", "Task Manager", "Shift + Esc", "Cmd + Opt + Esc"],
-                ["Инструменты разработчика", "Developer Tools", "Ctrl + Shift + I", "Cmd + Opt + I"],
-                ["Проверить элементы", "Inspect Element", "Ctrl + Shift + C", "Cmd + Opt + C"],
-                ["Консоль JavaScript", "JS Console", "Ctrl + Shift + J", "Cmd + Opt + J"]
+            ["Воспроизведение", "Playback & Markers", [
+                ["Воспроизведение / Пауза", "Play / Pause", "Space", "Space"],
+                ["Плей от выделения до конца", "Play from Selection", "Shift + Space", "Shift + Space"],
+                ["Запись со вставкой (Punch)", "Punch & Roll Record", "Shift + Alt + Space", "Shift + Opt + Space"],
+                ["Поставить маркер", "Add Marker", "M / *", "M / *"],
+                ["Прыжок по маркерам", "Go to Next/Prev Marker", "Ctrl + ← / →", "Cmd + ← / →"],
+                ["Вкл/Выкл привязку", "Snapping", "S", "S"]
+            ]],
+            ["Редактура и Эффекты", "Editing & Effects", [
+                ["Захват профиля шума", "Capture Noise Print", "Shift + P", "Shift + P"],
+                ["Повтор эффекта (Настр.)", "Repeat Last Effect (UI)", "Shift + R", "Shift + R"],
+                ["Повтор эффекта (Сразу)", "Repeat Last Effect", "Ctrl + R", "Cmd + R"],
+                ["Авто-восстановление", "Auto-Heal", "Ctrl + U", "Cmd + U"],
+                ["Вставить в новый файл", "Paste to New File", "Alt + Shift + V", "Opt + Shift + V"],
+                ["Вставить с микшированием", "Mix Paste", "Ctrl + Shift + V", "Cmd + Shift + V"],
+                ["Вставить тишину", "Insert Silence", "Shift + Del", "Shift + Del"],
+                ["Показать спектрограмму", "Spectral Frequency Disp.", "Shift + D", "Shift + D"]
+            ]],
+            ["Мультитрек и Сведение", "Multitrack & Mix", [
+                ["Разрезать клип", "Split Clip", "Ctrl + K", "Cmd + K"],
+                ["Сдвинуть клип влево / вправо", "Nudge Clip", "Alt + , / .", "Opt + , / ."],
+                ["Перекинуть клип на трек ↑/↓", "Nudge Clip Up/Down", "Alt + ↑ / ↓", "Opt + ↑ / ↓"],
+                ["Группировка клипов", "Group Clips", "Ctrl + G", "Cmd + G"],
+                ["Вкл/Откл Mute/Solo на всех", "Toggle All Mute/Solo", "Ctrl + Shift + Клик", "Cmd + Shift + Click"],
+                ["Плавная регулировка огиб.", "Adjust Envelope Fine", "Ctrl + Drag", "Cmd + Drag"],
+                ["Крупная регулировка огиб.", "Adjust Envelope Coarse", "Shift + Drag", "Shift + Drag"]
             ]]
         ]},
-        gd: { id: "gd", logo: "GD", title: "GOOGLE DOCS", color: "#1a73e8", meta: ["<a href='https://support.google.com/docs/answer/179738' target='_blank'>ГОРЯЧИЕ КЛАВИШИ GOOGLE DOCS</a>", "<a href='https://support.google.com/docs/answer/179738' target='_blank'>GOOGLE DOCS KEYBOARD SHORTCUTS</a>"], data: [
-            ["Общие действия", "General Actions", [
-                ["Копировать", "Copy", "Ctrl + C", "Cmd + C"],
-                ["Вырезать", "Cut", "Ctrl + X", "Cmd + X"],
-                ["Вставить", "Paste", "Ctrl + V", "Cmd + V"],
-                ["Вставить без форматов", "Paste without formatting", "Ctrl + Shift + V", "Cmd + Shift + V"],
-                ["Отменить действие", "Undo", "Ctrl + Z", "Cmd + Z"],
-                ["Повторить действие", "Redo", "Ctrl + Y", "Cmd + Y"],
-                ["Найти", "Find", "Ctrl + F", "Cmd + F"],
-                ["Найти и заменить", "Find and Replace", "Ctrl + H", "Cmd + Shift + H"],
-                ["Вставить ссылку", "Insert Link", "Ctrl + K", "Cmd + K"],
-                ["Открыть ссылку", "Open Link", "Alt + Enter", "Opt + Return"],
-                ["Печать", "Print", "Ctrl + P", "Cmd + P"],
-                ["Словарь / Определение", "Dictionary", "Ctrl + Shift + Y", "Cmd + Shift + Y"],
-                ["Статистика (символы)", "Word Count", "Ctrl + Shift + C", "Cmd + Shift + C"],
-                ["Разрыв страницы", "Insert Page Break", "Ctrl + Enter", "Cmd + Return"],
-                ["Скрыть меню (компакт)", "Compact Controls", "Ctrl + Shift + F", "Ctrl + Shift + F"],
-                ["Все горячие клавиши", "Shortcuts List", "Ctrl + /", "Cmd + /"]
+        ps: { id: "ps", logo: "PS", title: "ADOBE PHOTOSHOP", color: "#38bdf8", meta: ["<a href='https://helpx.adobe.com/ru/photoshop/desktop/get-started/settings-and-preferences/view-keyboard-shortcuts.html' target='_blank'>ГОРЯЧИЕ КЛАВИШИ ADOBE PHOTOSHOP</a>", "<a href='https://helpx.adobe.com/en/photoshop/using/default-keyboard-shortcuts.html' target='_blank'>ADOBE PHOTOSHOP KEYBOARD SHORTCUTS</a>"], data: [
+            ["Инструменты", "Tools", [
+                ["Перемещение (Move)", "Move Tool", "V", "V"],
+                ["Прямоуг. / Овал. область", "Marquee Tool", "M", "M"],
+                ["Лассо (Lasso)", "Lasso Tool", "L", "L"],
+                ["Быстрое выделение", "Quick Selection Tool", "W", "W"],
+                ["Рамка / Кадрирование", "Crop Tool", "C", "C"],
+                ["Пипетка (Eyedropper)", "Eyedropper", "I", "I"],
+                ["Восстанавливающая кисть", "Spot Healing Brush", "J", "J"],
+                ["Кисть / Карандаш (Brush)", "Brush Tool", "B", "B"],
+                ["Штамп (Clone Stamp)", "Clone Stamp Tool", "S", "S"],
+                ["Архивная кисть (History)", "History Brush", "Y", "Y"],
+                ["Ластик (Eraser)", "Eraser Tool", "E", "E"],
+                ["Градиент / Заливка", "Gradient / Paint Bucket", "G", "G"],
+                ["Осветлитель / Затемнитель", "Dodge / Burn", "O", "O"],
+                ["Перо (Pen)", "Pen Tool", "P", "P"],
+                ["Текст (Type)", "Type Tool", "T", "T"],
+                ["Выделение контура", "Path Selection", "A", "A"],
+                ["Фигуры (Shapes)", "Shape Tool", "U", "U"],
+                ["Рука (Hand)", "Hand Tool", "H / Space", "H / Space"],
+                ["Поворот вида", "Rotate View Tool", "R", "R"],
+                ["Перебор в группе инстр.", "Cycle Tool Group", "Shift + Буква", "Shift + Letter"]
             ]],
-            ["Формат текста", "Text Formatting", [
-                ["Жирный", "Bold", "Ctrl + B", "Cmd + B"],
-                ["Курсив", "Italic", "Ctrl + I", "Cmd + I"],
-                ["Подчеркнутый", "Underline", "Ctrl + U", "Cmd + U"],
-                ["Зачеркнутый", "Strikethrough", "Alt + Shift + 5", "Cmd + Shift + X"],
-                ["Надстрочный текст", "Superscript", "Ctrl + .", "Cmd + ."],
-                ["Подстрочный текст", "Subscript", "Ctrl + ,", "Cmd + ,"],
-                ["Копировать формат", "Copy Formatting", "Ctrl + Alt + C", "Cmd + Opt + C"],
-                ["Вставить формат", "Paste Formatting", "Ctrl + Alt + V", "Cmd + Opt + V"],
-                ["Очистить формат", "Clear Formatting", "Ctrl + \\", "Cmd + \\"],
-                ["Увеличить размер шрифта", "Increase Font Size", "Ctrl + Shift + .", "Cmd + Shift + ."],
-                ["Уменьшить размер шрифта", "Decrease Font Size", "Ctrl + Shift + ,", "Cmd + Shift + ,"]
+            ["Слои (Layers)", "Layers", [
+                ["Новый пустой слой", "New Layer", "Ctrl + Shift + N", "Cmd + Shift + N"],
+                ["Новый слой (без окна)", "New Layer (No Dialog)", "Ctrl + Alt + Shift + N", "Cmd + Opt + Shift + N"],
+                ["Дублировать слой", "Duplicate Layer", "Ctrl + J", "Cmd + J"],
+                ["Вырезать на новый слой", "Layer via Cut", "Ctrl + Shift + J", "Cmd + Shift + J"],
+                ["Сгруппировать слои", "Group Layers", "Ctrl + G", "Cmd + G"],
+                ["Разгруппировать", "Ungroup Layers", "Ctrl + Shift + G", "Cmd + Shift + G"],
+                ["Объединить выделенные", "Merge Layers", "Ctrl + E", "Cmd + E"],
+                ["Объединить видимые", "Merge Visible", "Ctrl + Shift + E", "Cmd + Shift + E"],
+                ["Слить видимые (Stamp)", "Stamp Visible", "Ctrl + Alt + Shift + E", "Cmd + Opt + Shift + E"],
+                ["Переместить слой вверх / вниз", "Move Layer Up/Down", "Ctrl + [ / ]", "Cmd + [ / ]"],
+                ["Переместить в самый верх", "Move Layer Top/Bottom", "Ctrl + Shift + [ / ]", "Cmd + Shift + [ / ]"],
+                ["Выбрать слой выше / ниже", "Select Layer Up/Down", "Alt + [ / ]", "Opt + [ / ]"],
+                ["Добавить к выделению", "Add Layer to Selection", "Alt + Shift + [ / ]", "Opt + Shift + [ / ]"],
+                ["Обтравочная маска", "Clipping Mask", "Ctrl + Alt + G", "Cmd + Opt + G"],
+                ["Непрозрачность (Opacity)", "Layer Opacity", "1 - 0", "1 - 0"],
+                ["Заливка (Fill)", "Layer Fill", "Shift + 1 - 0", "Shift + 1 - 0"],
+                ["Перебор режимов наложения", "Cycle Blend Modes", "Shift + +/-", "Shift + +/-"]
             ]],
-            ["Абзацы и Списки", "Paragraphs & Lists", [
-                ["Обычный текст", "Normal Text", "Ctrl + Alt + 0", "Cmd + Opt + 0"],
-                ["Заголовок (1–6)", "Heading 1-6", "Ctrl + Alt + 1-6", "Cmd + Opt + 1-6"],
-                ["По левому краю", "Align Left", "Ctrl + Shift + L", "Cmd + Shift + L"],
-                ["По центру", "Align Center", "Ctrl + Shift + E", "Cmd + Shift + E"],
-                ["По правому краю", "Align Right", "Ctrl + Shift + R", "Cmd + Shift + R"],
-                ["По ширине", "Justify", "Ctrl + Shift + J", "Cmd + Shift + J"],
-                ["Увеличить отступ", "Increase Indent", "Ctrl + ]", "Cmd + ]"],
-                ["Уменьшить отступ", "Decrease Indent", "Ctrl + [", "Cmd + ["],
-                ["Нумерованный список", "Numbered List", "Ctrl + Shift + 7", "Cmd + Shift + 7"],
-                ["Маркированный список", "Bulleted List", "Ctrl + Shift + 8", "Cmd + Shift + 8"],
-                ["Чек-лист (задачи)", "Checklist", "Ctrl + Shift + 9", "Cmd + Shift + 9"],
-                ["Сдвиг строки ↑ / ↓", "Move Paragraph ↑ / ↓", "Ctrl + Shift + ↑/↓", "Cmd + Shift + ↑/↓"]
-            ]],
-            ["Медиа, Таблицы и Комменты", "Media, Tables & Comments", [
-                ["Добавить комментарий", "Insert Comment", "Ctrl + Alt + M", "Cmd + Opt + M"],
-                ["Открыть ветку комментов", "Open Comment Thread", "Ctrl + Alt + Shift + A", "Cmd + Opt + Shift + A"],
-                ["Добавить Alt text", "Add Alt Text", "Ctrl + Alt + Y", "Cmd + Opt + Y"],
-                ["Увеличить картинку", "Resize Image Larger", "Ctrl + Alt + K", "Cmd + Ctrl + K"],
-                ["Уменьшить картинку", "Resize Image Smaller", "Ctrl + Alt + J", "Cmd + Ctrl + J"],
-                ["Навигация по таблице", "Move in Table", "Tab / Shift + Tab", "Tab / Shift + Tab"]
-            ]]
-        ]},
-        gs: { id: "gs", logo: "GS", title: "GOOGLE SHEETS", color: "#0f9d58", meta: ["<a href='https://support.google.com/docs/answer/181110' target='_blank'>ГОРЯЧИЕ КЛАВИШИ GOOGLE SHEETS</a>", "<a href='https://support.google.com/docs/answer/181110' target='_blank'>GOOGLE SHEETS KEYBOARD SHORTCUTS</a>"], data: [
-            ["Действия и навигация", "Actions & Navigation", [
-                ["Копировать", "Copy", "Ctrl + C", "Cmd + C"],
-                ["Вырезать", "Cut", "Ctrl + X", "Cmd + X"],
-                ["Вставить", "Paste", "Ctrl + V", "Cmd + V"],
-                ["Вставить значения", "Paste Values Only", "Ctrl + Shift + V", "Cmd + Shift + V"],
-                ["Отменить", "Undo", "Ctrl + Z", "Cmd + Z"],
-                ["Повторить", "Redo", "Ctrl + Y", "Cmd + Y"],
-                ["Найти", "Find", "Ctrl + F", "Cmd + F"],
-                ["Заменить", "Find and Replace", "Ctrl + H", "Cmd + Shift + H"],
-                ["Край данных", "Move to Edge of Data", "Ctrl + Стрелки", "Cmd + Arrows"],
-                ["Выделить массив", "Select Data Array", "Ctrl + Shift + Стрелки", "Cmd + Shift + Arrows"],
-                ["Список шорткатов", "Shortcuts List", "Ctrl + /", "Cmd + /"],
-                ["Поиск по меню", "Search Menus", "Alt + /", "Opt + /"],
-                ["Скрыть меню", "Compact Controls", "Ctrl + Shift + F", "Ctrl + Shift + F"]
-            ]],
-            ["Строки и столбцы", "Rows & Columns", [
-                ["Выделить столбец", "Select Column", "Ctrl + Space", "Ctrl + Space"],
-                ["Выделить строку", "Select Row", "Shift + Space", "Shift + Space"],
+            ["Выделение и Маски", "Selection & Masks", [
                 ["Выделить всё", "Select All", "Ctrl + A", "Cmd + A"],
-                ["Добавить строку/столбец", "Insert Row/Column", "Ctrl + Alt + =", "Cmd + Opt + ="],
-                ["Удалить строку/столбец", "Delete Row/Column", "Ctrl + Alt + -", "Cmd + Opt + -"],
-                ["Скрыть строку", "Hide Row", "Ctrl + Alt + 9", "Cmd + Opt + 9"],
-                ["Скрыть столбец", "Hide Column", "Ctrl + Alt + 0", "Cmd + Opt + 0"],
-                ["Новый лист", "Insert New Sheet", "Shift + F11", "Shift + F11"],
-                ["Следующий лист", "Move to Next Sheet", "Alt + ↓", "Opt + ↓"],
-                ["Предыдущий лист", "Move to Prev Sheet", "Alt + ↑", "Opt + ↑"]
+                ["Снять выделение", "Deselect", "Ctrl + D", "Cmd + D"],
+                ["Вернуть выделение", "Reselect", "Ctrl + Shift + D", "Cmd + Shift + D"],
+                ["Инвертировать выделение", "Inverse Selection", "Ctrl + Shift + I", "Cmd + Shift + I"],
+                ["Растушевка (Feather)", "Feather Selection", "Shift + F6", "Shift + F6"],
+                ["Выделить пиксели слоя", "Load Selection", "Ctrl + Клик (Иконка)", "Cmd + Click (Icon)"],
+                ["Режим быстрой маски", "Quick Mask Mode", "Q", "Q"],
+                ["Показать только маску", "Show Mask Only", "Alt + Клик (Маска)", "Opt + Click (Mask)"],
+                ["Вкл/Откл маску слоя", "Disable Mask", "Shift + Клик (Маска)", "Shift + Click (Mask)"]
             ]],
-            ["Данные и формулы", "Data & Formulas", [
-                ["Заполнить диапазон", "Fill Range", "Ctrl + Enter", "Cmd + Return"],
-                ["Скопировать сверху", "Fill Down", "Ctrl + D", "Cmd + D"],
-                ["Скопировать слева", "Fill Right", "Ctrl + R", "Cmd + R"],
-                ["Текущая дата", "Insert Current Date", "Ctrl + ;", "Cmd + ;"],
-                ["Текущее время", "Insert Current Time", "Ctrl + Shift + ;", "Cmd + Shift + ;"],
-                ["Вставить ссылку", "Insert Link", "Ctrl + K", "Cmd + K"],
-                ["Перенос строки в ячейке", "Insert Newline", "Alt + Enter", "Opt + Return"],
-                ["Абсолютная ссылка / Повтор", "Absolute Reference / F4", "F4", "F4"],
-                ["Вставить формулу массива", "Insert Array Formula", "Ctrl + Shift + Enter", "Cmd + Shift + Return"],
-                ["Показать все формулы", "Show All Formulas", "Ctrl + ~", "Cmd + ~"]
+            ["Трансформация", "Transforms", [
+                ["Свободное трансформирование", "Free Transform", "Ctrl + T", "Cmd + T"],
+                ["Трансформ. с копией", "Transform with Copy", "Ctrl + Alt + T", "Cmd + Opt + T"],
+                ["Повтор трансформ.", "Repeat Transform", "Ctrl + Shift + T", "Cmd + Shift + T"],
+                ["Повтор с копией", "Repeat Transform (Copy)", "Ctrl + Alt + Shift + T", "Cmd + Opt + Shift + T"],
+                ["Искажение (Distort)", "Distort", "Ctrl + Drag (Угол)", "Cmd + Drag (Corner)"],
+                ["Симметрия (Perspective)", "Perspective", "Ctrl+Alt+Shift+Drag", "Cmd+Opt+Shift+Drag"]
             ]],
-            ["Формат ячеек", "Cell Formatting", [
-                ["Жирный", "Bold", "Ctrl + B", "Cmd + B"],
-                ["Курсив", "Italic", "Ctrl + I", "Cmd + I"],
-                ["Подчеркнутый", "Underline", "Ctrl + U", "Cmd + U"],
-                ["Зачеркнутый", "Strikethrough", "Alt + Shift + 5", "Opt + Shift + 5"],
-                ["Влево", "Align Left", "Ctrl + Shift + L", "Cmd + Shift + L"],
-                ["По центру", "Align Center", "Ctrl + Shift + E", "Cmd + Shift + E"],
-                ["Вправо", "Align Right", "Ctrl + Shift + R", "Cmd + Shift + R"],
-                ["Сбросить формат", "Clear Formatting", "Ctrl + \\", "Cmd + \\"],
-                ["Добавить внешние границы", "Apply Outer Borders", "Ctrl + Shift + 7", "Cmd + Shift + 7"],
-                ["Удалить границы", "Remove Borders", "Ctrl + Shift + 6", "Cmd + Shift + 6"]
+            ["Кисти и Цвета", "Brushes & Colors", [
+                ["Размер кисти", "Brush Size", "[ / ]", "[ / ]"],
+                ["Жесткость кисти", "Brush Hardness", "Shift + [ / ]", "Shift + [ / ]"],
+                ["Размер/жесткость (HUD)", "HUD Brush Resize", "Alt + ПКМ + Drag", "Ctrl + Opt + Drag"],
+                ["Сбросить цвета (ч/б)", "Default Colors (D)", "D", "D"],
+                ["Поменять цвета местами", "Switch Colors", "X", "X"],
+                ["Залить передним цветом", "Fill Foreground Color", "Alt + Bksp", "Opt + Del"],
+                ["Залить задним цветом", "Fill Background Color", "Ctrl + Bksp", "Cmd + Del"],
+                ["Заливка (с прозрачн.)", "Fill (Preserve Transp.)", "Shift + Alt + Bksp", "Shift + Opt + Del"]
             ]],
-            ["Формат чисел", "Number Formatting", [
-                ["Десятичный", "Decimal Format", "Ctrl + Shift + 1", "Ctrl + Shift + 1"],
-                ["Время", "Time Format", "Ctrl + Shift + 2", "Ctrl + Shift + 2"],
-                ["Дата", "Date Format", "Ctrl + Shift + 3", "Ctrl + Shift + 3"],
-                ["Валюта", "Currency Format", "Ctrl + Shift + 4", "Ctrl + Shift + 4"],
-                ["Проценты", "Percentage Format", "Ctrl + Shift + 5", "Ctrl + Shift + 5"],
-                ["Экспоненциальный", "Exponential Format", "Ctrl + Shift + 6", "Ctrl + Shift + 6"]
-            ]]
-        ]},
-        np: { id: "np", logo: "NP", title: "NOTEPAD++", color: "#15803d", meta: ["НАСТРОЙКИ > ГОРЯЧИЕ КЛАВИШИ", "SETTINGS > KEYBOARD SHORTCUTS"], data: [
-            ["Файл", "File", [
-                ["Новый файл", "New File", "Ctrl + N"],
-                ["Открыть файл", "Open File", "Ctrl + O"],
-                ["Сохранить", "Save", "Ctrl + S"],
-                ["Сохранить как", "Save As", "Ctrl + Alt + S"],
-                ["Сохранить все", "Save All", "Ctrl + Shift + S"],
-                ["Закрыть вкладку", "Close Tab", "Ctrl + W"],
-                ["Закрыть все вкладки", "Close All", "Ctrl + Shift + W"],
-                ["Печать", "Print", "Ctrl + P"],
-                ["Свойства файла", "File Properties", "Alt + Enter"]
+            ["Цвет и Фильтры", "Color & Filters", [
+                ["Уровни (Levels)", "Levels", "Ctrl + L", "Cmd + L"],
+                ["Кривые (Curves)", "Curves", "Ctrl + M", "Cmd + M"],
+                ["Тон / Насыщенность", "Hue/Saturation", "Ctrl + U", "Cmd + U"],
+                ["Цветовой баланс", "Color Balance", "Ctrl + B", "Cmd + B"],
+                ["Обесцветить", "Desaturate", "Ctrl + Shift + U", "Cmd + Shift + U"],
+                ["Инвертировать цвета", "Invert Colors", "Ctrl + I", "Cmd + I"],
+                ["Черно-белое", "Black & White", "Ctrl + Alt + Shift + B", "Cmd + Opt + Shift + B"],
+                ["Автотон", "Auto Tone", "Ctrl + Shift + L", "Cmd + Shift + L"],
+                ["Автоконтраст", "Auto Contrast", "Ctrl + Alt + Shift + L", "Cmd + Opt + Shift + L"],
+                ["Авто-цветокоррекция", "Auto Color", "Ctrl + Shift + B", "Cmd + Shift + B"],
+                ["Повтор фильтра", "Last Filter", "Ctrl + Alt + F", "Cmd + Opt + F"],
+                ["Пластика (Liquify)", "Liquify", "Ctrl + Shift + X", "Cmd + Shift + X"],
+                ["Camera Raw Filter", "Camera Raw Filter", "Ctrl + Shift + A", "Cmd + Shift + A"]
             ]],
-            ["Правка", "Edit", [
-                ["Отменить", "Undo", "Ctrl + Z"],
-                ["Повторить", "Redo", "Ctrl + Y"],
-                ["Вырезать", "Cut", "Ctrl + X"],
-                ["Копировать", "Copy", "Ctrl + C"],
-                ["Вставить", "Paste", "Ctrl + V"],
-                ["Дублировать строку", "Duplicate Line", "Ctrl + D"],
-                ["Вырезать строку", "Cut Line", "Ctrl + L"],
-                ["Удалить строку", "Delete Line", "Ctrl + Shift + L"],
-                ["Поменять с предыдущей", "Transpose Line", "Ctrl + T"],
-                ["Сдвиг строки ↑ / ↓", "Move Line Up/Down", "Ctrl + Shift + ↑/↓"],
-                ["Нижний регистр", "To Lowercase", "Ctrl + U"],
-                ["Верхний регистр", "To Uppercase", "Ctrl + Shift + U"],
-                ["Собственный регистр", "Proper Case", "Alt + U"],
-                ["Комментировать строку", "Toggle Comment", "Ctrl + Q"],
-                ["Блочное комментирование", "Block Comment", "Ctrl + Shift + Q"]
-            ]],
-            ["Поиск и Вид", "Search & View", [
-                ["Найти", "Find", "Ctrl + F"],
-                ["Найти и заменить", "Replace", "Ctrl + H"],
-                ["Найти в файлах", "Find in Files", "Ctrl + Shift + F"],
-                ["Найти далее", "Find Next", "F3"],
-                ["Найти предыдущее", "Find Previous", "Shift + F3"],
-                ["Поиск выделенного (вперед)", "Find Volatile Next", "Ctrl + F3"],
-                ["Поиск выделенного (назад)", "Find Volatile Prev", "Ctrl + Shift + F3"],
-                ["Перейти к строке", "Go to Line", "Ctrl + G"],
-                ["Полноэкранный режим", "Toggle Fullscreen", "F11"],
-                ["Масштаб (+ / -)", "Zoom In/Out", "Ctrl + Scroll"],
-                ["Сбросить масштаб", "Reset Zoom", "Ctrl + Num /"],
-                ["Следующая вкладка", "Next Tab", "Ctrl + Tab / PgDn"],
-                ["Предыдущая вкладка", "Prev Tab", "Ctrl + Shift + Tab"],
-                ["Свернуть все блоки", "Collapse All", "Alt + 0"],
-                ["Развернуть все блоки", "Uncollapse All", "Alt + Shift + 0"],
-                ["Свернуть текущий уровень", "Collapse Current", "Ctrl + Alt + F"],
-                ["Развернуть тек. уровень", "Uncollapse Current", "Ctrl + Alt + Shift + F"]
-            ]],
-            ["Макросы и Закладки", "Macros & Bookmarks", [
-                ["Запись макроса (Старт/Стоп)", "Start/Stop Record Macro", "Ctrl + Shift + R"],
-                ["Воспроизвести макрос", "Playback Macro", "Ctrl + Shift + P"],
-                ["Многократное воспр-е", "Run Macro Multiple Times", "Alt + Shift + P"],
-                ["Поставить закладку", "Toggle Bookmark", "Ctrl + F2"],
-                ["К следующей закладке", "Next Bookmark", "F2"],
-                ["К предыдущей закладке", "Previous Bookmark", "Shift + F2"]
-            ]]
-        ]},
-        wn: { id: "wn", logo: "OS", title: "SYSTEM OS", color: "#0369a1", meta: ["ГОРЯЧИЕ КЛАВИШИ: <a href='https://support.microsoft.com/ru-ru/windows/%D1%81%D0%BE%D1%87%D0%B5%D1%82%D0%B0%D0%BD%D0%B8%D1%8F-%D0%BA%D0%BB%D0%B0%D0%B2%D0%B8%D1%88-%D0%B2-windows-dcc61a57-8ff0-cffe-9796-cb9706c75eec' target='_blank'>WINDOWS</a> И <a href='https://support.apple.com/ru-ru/102650' target='_blank'>macOS</a>", "KEYBOARD SHORTCUTS: <a href='https://support.microsoft.com/en-us/windows/keyboard-shortcuts-in-windows-dcc61a57-8ff0-cffe-9796-cb9706c75eec' target='_blank'>WINDOWS</a> & <a href='https://support.apple.com/en-us/102650' target='_blank'>macOS</a>"], data: [
-            ["Система", "System & UI", [
-                ["Эмодзи и спецсимволы", "Emoji Panel", "Win + .", "Cmd + Ctrl + Space"],
-                ["История буфера обмена", "Clipboard History", "Win + V", "Cmd + C / V"],
-                ["Скриншот области", "Screenshot Area", "Win + Shift + S", "Cmd + Shift + 4"],
-                ["Запись экрана", "Screen Recording", "Win + Alt + R", "Cmd + Shift + 5"],
-                ["Меню Сисадмина", "Power User Menu", "Win + X", "Opt + Apple Menu"],
-                ["Окно «Выполнить» / Spotlight", "Run / Spotlight Search", "Win + R", "Cmd + Space"],
-                ["Диспетчер задач", "Task Manager / Force Quit", "Ctrl + Shift + Esc", "Cmd + Opt + Esc"],
-                ["Настройки системы", "System Settings", "Win + I", "Cmd + ,"],
-                ["Блокировка системы", "Lock Account", "Win + L", "Cmd + Ctrl + Q"],
-                ["Меню проекции (мониторы)", "Display Projection Menu", "Win + P", "Cmd + F1"],
-                ["Очистить корзину", "Empty Trash", "ПКМ по корзине", "Cmd + Shift + Bksp"]
-            ]],
-            ["Окна и пространство", "Windows & Workspace", [
-                ["Свернуть всё (Рабочий стол)", "Show Desktop", "Win + D", "Cmd + F3"],
-                ["Свернуть всё, кроме активного", "Hide Others", "Win + Home", "Cmd + Opt + H"],
-                ["Свернуть текущее окно", "Minimize Window", "Win + ↓", "Cmd + M"],
-                ["Развернуть окно", "Maximize Window", "Win + ↑", "Ctrl + Cmd + F"],
-                ["Прилепить окно к краю", "Snap Window", "Win + Стрелки", "Fn + Ctrl + Arrows"],
-                ["Переключение окон", "Switch App", "Alt + Tab", "Cmd + Tab"],
-                ["Представление задач", "Task View / Mission Control", "Win + Tab", "Ctrl + ↑"],
-                ["Закрыть программу", "Quit App", "Alt + F4", "Cmd + Q"],
-                ["Закрыть окно", "Close Window", "Ctrl + W", "Cmd + W"],
-                ["Приложения в панели", "Taskbar / Dock Apps", "Win + 1 - 9", "Cmd + 1 - 9"]
-            ]],
-            ["Виртуальные столы", "Virtual Desktops", [
-                ["Создать новый стол", "New Desktop", "Win + Ctrl + D", "F3 -> +"],
-                ["Смена рабочих столов", "Switch Desktop", "Win + Ctrl + ←/→", "Ctrl + ←/→"],
-                ["Закрыть текущий стол", "Close Desktop", "Win + Ctrl + F4", "Opt + Click X"]
-            ]],
-            ["Файловый менеджер", "File Manager", [
-                ["Открыть Проводник / Finder", "Open Explorer / Finder", "Win + E", "Cmd + N"],
-                ["Выделить адресную строку", "Focus Address Bar", "Alt + D / Ctrl + L", "Cmd + L"],
-                ["Создать новую папку", "New Folder", "Ctrl + Shift + N", "Cmd + Shift + N"],
-                ["Переименовать", "Rename", "F2", "Return"],
-                ["Удалить в корзину", "Move to Trash", "Del", "Cmd + Bksp"],
-                ["Удалить безвозвратно", "Delete Permanently", "Shift + Del", "Cmd + Opt + Bksp"],
-                ["Свойства файла/папки", "File Properties / Info", "Alt + Enter", "Cmd + I"],
-                ["Область предпросмотра", "Preview Pane / Quick Look", "Alt + P", "Space"],
-                ["Панель сведений", "Details Pane / Show Preview", "Alt + Shift + P", "Cmd + Shift + P"]
-            ]]
-        ]},
-        tc: { id: "tc", logo: "TC", title: "TOTAL COMMANDER", color: "#3730a3", meta: ["СПРАВКА > ГОРЯЧИЕ КЛАВИШИ", "HELP > KEYBOARD SHORTCUTS"], data: [
-            ["Файлы", "File Operations", [
-                ["Просмотр (Lister)", "View (Lister)", "F3"], 
-                ["Редактировать", "Edit", "F4"], 
-                ["Копировать", "Copy", "F5"], 
-                ["Копировать в ту же папку", "Copy in Same Dir", "Shift + F5"],
-                ["Переименовать / Переместить", "Rename / Move", "F6"], 
-                ["Создать каталог", "New Folder", "F7"], 
-                ["Удалить", "Delete", "F8 / Del"],
-                ["Удалить без корзины", "Delete Permanently", "Shift + F8 / Shift + Del"],
-                ["Свойства файла", "Properties", "Alt + Enter"]
-            ]],
-            ["Навигация", "Navigation", [
-                ["Переключить панель", "Switch Panel", "Tab"], 
-                ["Диск слева", "Left Drive", "Alt + F1"], 
-                ["Диск справа", "Right Drive", "Alt + F2"], 
-                ["Избранные каталоги", "Directory Hotlist", "Ctrl + D"], 
-                ["История каталогов", "Directory History", "Alt + ↓"], 
-                ["На уровень вверх", "Go Up Dir", "Bksp"], 
-                ["В корневой каталог", "Go to Root", "Ctrl + \\"],
-                ["Обновить панель", "Refresh Panel", "F2 / Ctrl + R"]
-            ]],
-            ["Работа с вкладками", "Tabs", [
-                ["Новая вкладка", "New Tab", "Ctrl + T"], 
-                ["Каталог в новой вкладке", "Open Dir in New Tab", "Ctrl + ↑"], 
-                ["Закрыть вкладку", "Close Tab", "Ctrl + W"], 
-                ["Закрыть все вкладки", "Close All Tabs", "Ctrl + Shift + W"], 
-                ["Вкладка вперед/назад", "Switch Tabs", "Ctrl + Tab"]
-            ]],
-            ["Выделение", "Selection", [
-                ["Выделить / Снять (со сдвигом)", "Select / Unselect", "Insert"], 
-                ["Выделить по маске", "Select Group", "Num +"], 
-                ["Снять выделение по маске", "Unselect Group", "Num -"],
-                ["Инвертировать выделение", "Invert Selection", "Num *"], 
-                ["Выделить всё", "Select All", "Ctrl + A / Num +"], 
-                ["Снять выделение со всех", "Unselect All", "Ctrl + Num -"], 
-                ["Выделить по расширению", "Select by Extension", "Alt + Num +"]
-            ]],
-            ["Архивы и Сеть", "Archives & Network", [
-                ["Упаковать в архив", "Pack Files", "Alt + F5"], 
-                ["Распаковать архив", "Unpack Files", "Alt + F9"], 
-                ["Проверить архив", "Test Archive", "Alt + Shift + F9"],
-                ["Новое FTP соединение", "New FTP Connection", "Ctrl + N"],
-                ["Отключиться от FTP", "Disconnect FTP", "Ctrl + Shift + F"]
-            ]],
-            ["Спец. команды", "Special Commands", [
-                ["Новый текстовый файл", "New Text File", "Shift + F4"], 
-                ["Переименовать на месте", "Rename in Place", "Shift + F6"], 
-                ["Массовое переименов-е", "Multi-Rename Tool", "Ctrl + M"], 
-                ["Плоский список файлов", "Branch View", "Ctrl + B"], 
-                ["Просмотр во 2-й панели", "Quick View Panel", "Ctrl + Q"], 
-                ["Подсчитать объем", "Calculate Space", "Ctrl + L"], 
-                ["Поиск файлов", "Search", "Ctrl + F / Alt+F7"],
-                ["Синхронизация каталогов", "Synchronize Dirs", "Shift + Esc"]
+            ["Интерфейс и Файлы", "Interface & Files", [
+                ["Скрыть/Показать UI", "Toggle UI", "Tab", "Tab"],
+                ["Скрыть/Показать правые панели", "Toggle Right Panels", "Shift + Tab", "Shift + Tab"],
+                ["Переключение режимов экрана", "Screen Modes", "F", "F"],
+                ["Реальный размер пикселей", "100% Zoom", "Ctrl + 1", "Cmd + 1"],
+                ["Подогнать под размер экрана", "Fit on Screen", "Ctrl + 0", "Cmd + 0"],
+                ["Вкл/Откл линейки", "Toggle Rulers", "Ctrl + R", "Cmd + R"],
+                ["Вкл/Откл направляющие", "Toggle Guides", "Ctrl + ;", "Cmd + ;"],
+                ["Вкл/Откл сетку", "Toggle Grid", "Ctrl + '", "Cmd + '"],
+                ["Сохранить как", "Save As", "Ctrl + Shift + S", "Cmd + Shift + S"],
+                ["Экспортировать как...", "Export As...", "Ctrl + Alt + Shift + W", "Cmd + Opt + Shift + W"],
+                ["Сохранить для Web", "Save for Web", "Ctrl + Alt + Shift + S", "Cmd + Opt + Shift + S"],
+                ["Закрыть текущий документ", "Close Document", "Ctrl + W", "Cmd + W"],
+                ["Закрыть все документы", "Close All", "Ctrl + Alt + W", "Cmd + Opt + W"]
             ]]
         ]},
         pr: { id: "pr", logo: "PR", title: "ADOBE PREMIERE", color: "#4f46e5", meta: ["<a href='https://helpx.adobe.com/ru/premiere/desktop/get-started/keyboard-shortcuts/default-keyboard-shortcuts.html' target='_blank'>ГОРЯЧИЕ КЛАВИШИ ADOBE PREMIERE</a>", "<a href='https://helpx.adobe.com/en/premiere/using/default-keyboard-shortcuts-cc.html' target='_blank'>ADOBE PREMIERE KEYBOARD SHORTCUTS</a>"], data: [
@@ -822,92 +865,6 @@
                 ["Группировка клипов", "Group", "Ctrl + G", "Cmd + G"],
                 ["Разгруппировать", "Ungroup", "Ctrl + Shift + G", "Cmd + Shift + G"],
                 ["Скрытое меню языка (Debug)", "Console / Debug Menu", "Ctrl + F12", "Cmd + F12"]
-            ]]
-        ]},
-        da: { id: "da", logo: "DR", title: "DAVINCI RESOLVE", color: "#c2410c", meta: ["<a href='https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion' target='_blank'>ГОРЯЧИЕ КЛАВИШИ DAVINCI RESOLVE</a>", "<a href='https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion' target='_blank'>DAVINCI RESOLVE KEYBOARD SHORTCUTS</a>"], data: [
-            ["Интерфейс", "Interface & Pages", [
-                ["Настройки пользователя", "User Preferences", "Ctrl + ,", "Cmd + ,"],
-                ["Настройки проекта", "Project Settings", "Shift + 9", "Shift + 9"],
-                ["Вкладка Media", "Media Page", "Shift + 2", "Shift + 2"],
-                ["Вкладка Cut", "Cut Page", "Shift + 3", "Shift + 3"],
-                ["Вкладка Edit", "Edit Page", "Shift + 4", "Shift + 4"],
-                ["Вкладка Fusion", "Fusion Page", "Shift + 5", "Shift + 5"],
-                ["Вкладка Color", "Color Page", "Shift + 6", "Shift + 6"],
-                ["Вкладка Fairlight", "Fairlight Page", "Shift + 7", "Shift + 7"],
-                ["Вкладка Deliver", "Deliver Page", "Shift + 8", "Shift + 8"],
-                ["Во весь экран (Cinema)", "Cinema Viewer", "Ctrl + F", "Cmd + F"],
-                ["Расширенный экран (Color)", "Enhanced Viewer", "Alt + F", "Opt + F"]
-            ]],
-            ["Метки и Навигация", "Markers & Navigation", [
-                ["Точка Входа / Выхода", "Mark In / Out", "I / O", "I / O"],
-                ["Снять выделение In/Out", "Clear In/Out", "Alt + X", "Opt + X"],
-                ["In/Out по краям клипа", "Mark Clip", "X", "X"],
-                ["Поставить маркер", "Add Marker", "M", "M"],
-                ["Изменить маркер", "Modify Marker", "Double M", "Double M"],
-                ["Уместить таймлайн", "Zoom to Fit", "Shift + Z", "Shift + Z"],
-                ["Масштаб таймлайна (+ / -)", "Zoom In/Out", "Ctrl + = / -", "Cmd + = / -"],
-                ["Плей / Пауза", "Play / Pause", "Space", "Space"],
-                ["Вперед/Назад (Shuttle)", "Shuttle", "J / K / L", "J / K / L"]
-            ]],
-            ["EDIT: Монтаж", "EDIT: Editing", [
-                ["Обычный курсор", "Normal Edit Mode", "A", "A"],
-                ["Лезвие (Blade)", "Blade", "B", "B"],
-                ["Динамический тримминг", "Dynamic Trim Mode", "W", "W"],
-                ["Выделить вперед (текущая)", "Select Clips Forward", "Y", "Y"],
-                ["Выделить вперед (все)", "Select All Forward", "Alt + Y", "Opt + Y"],
-                ["Выделить назад (текущая)", "Select Clips Backward", "Ctrl + Y", "Cmd + Y"],
-                ["Выделить назад (все)", "Select All Backward", "Ctrl + Alt + Y", "Cmd + Opt + Y"],
-                ["Разрезать клип", "Split Clip", "Ctrl + \\ / B", "Cmd + \\ / B"],
-                ["Связь видео и звука", "Link/Unlink", "Ctrl + Shift + L", "Cmd + Shift + L"],
-                ["Вставить (Insert)", "Insert", "F9", "F9"],
-                ["Перезаписать (Overwrite)", "Overwrite", "F10", "F10"],
-                ["Заменить (Replace)", "Replace", "F11", "F11"],
-                ["На верхнюю дорожку", "Place on Top", "F12", "F12"],
-                ["Вставить в конец (Append)", "Append at End", "Shift + F12", "Shift + F12"],
-                ["Свойства клипа (Inspector)", "Inspector", "Alt + 1", "Cmd + 1"]
-            ]],
-            ["EDIT: Тримминг", "EDIT: Trimming", [
-                ["Удалить (оставить пустоту)", "Delete", "Bksp", "Del"],
-                ["Удалить со сдвигом", "Ripple Delete", "Shift + Bksp", "Shift + Del"],
-                ["Срезать слева до плейхеда", "Ripple Start to Playhead", "Ctrl + Shift + [", "Cmd + Shift + ["],
-                ["Срезать справа до плейхеда", "Ripple End to Playhead", "Ctrl + Shift + ]", "Cmd + Shift + ]"],
-                ["Сдвинуть клип на 1 кадр", "Nudge 1 Frame", ", / .", ", / ."],
-                ["Сдвинуть на 5 кадров", "Nudge 5 Frames", "Shift + , / .", "Shift + , / ."],
-                ["Изменение скорости (Retime)", "Retime Controls", "Ctrl + R", "Cmd + R"],
-                ["Добавить переход", "Add Transition", "Ctrl + T", "Cmd + T"],
-                ["Копировать атрибуты", "Copy Attributes", "Ctrl + C", "Cmd + C"],
-                ["Вставить атрибуты", "Paste Attributes", "Alt + V", "Opt + V"]
-            ]],
-            ["COLOR: Цвет", "COLOR: Grading", [
-                ["Добавить Serial Node", "Add Serial Node", "Alt + S", "Opt + S"],
-                ["Добавить Serial Before", "Add Serial Before", "Shift + S", "Shift + S"],
-                ["Добавить Parallel Node", "Add Parallel Node", "Alt + P", "Opt + P"],
-                ["Добавить Layer Node", "Add Layer Node", "Alt + L", "Opt + L"],
-                ["Добавить Outside Node", "Add Outside Node", "Alt + O", "Opt + O"],
-                ["Добавить Splitter/Combiner", "Add Splitter/Combiner", "Alt + Y", "Opt + Y"],
-                ["Вкл/Выкл одну ноду", "Disable Node", "Ctrl + D", "Cmd + D"],
-                ["Вкл/Выкл все ноды (Bypass)", "Bypass Color Grades", "Shift + D", "Shift + D"],
-                ["Сбросить одну ноду", "Reset Node Grade", "Shift + Home", "Shift + Home"],
-                ["Сбросить все ноды", "Reset All Grades", "Ctrl + Home", "Cmd + Home"],
-                ["Предыдущий клип", "Previous Clip", "Up", "Up"],
-                ["Следующий клип", "Next Clip", "Down", "Down"],
-                ["Копировать грейд (с пред.)", "Apply Grade from Prev", "Middle Click / =", "Middle Click / ="],
-                ["Сравнение До/После", "Wipe Timeline Clip", "Ctrl + W", "Cmd + W"],
-                ["Трекинг маски вперёд", "Track Forward", "Ctrl + T", "Cmd + T"],
-                ["Трекинг назад", "Track Reverse", "Ctrl + Shift + T", "Cmd + Shift + T"]
-            ]],
-            ["FUSION: Ноды", "FUSION: Node Graph", [
-                ["Меню выбора/создания ноды", "Add Tool / Node Menu", "Shift + Space", "Shift + Space"],
-                ["Вывод во Viewer 1-4 / Out", "Route to Viewer 1-4", "1 - 4", "1 - 4"],
-                ["Отключить ноду (Pass Through)", "Pass Through", "Ctrl + P", "Cmd + P"],
-                ["Группировать ноды", "Group Nodes", "Ctrl + G", "Cmd + G"],
-                ["Масштаб нод к 100%", "Zoom 100%", "Ctrl + 1", "Cmd + 1"]
-            ]],
-            ["FAIRLIGHT: Звук", "FAIRLIGHT: Audio", [
-                ["Запись звука", "Start Recording", "Shift + R", "Shift + R"],
-                ["Микшер", "Toggle Mixer", "Shift + M", "Shift + M"],
-                ["Автоматизация", "Toggle Automation", "Ctrl + Alt + A", "Cmd + Opt + A"],
-                ["Приглушить дорожку (Mute)", "Mute Track", "Shift + T", "Shift + T"]
             ]]
         ]},
         bl: { id: "bl", logo: "BL", title: "BLENDER", color: "#ea580c", meta: ["<a href='https://docs.blender.org/manual/ru/latest/interface/keymap/blender_default.html' target='_blank'>ГОРЯЧИЕ КЛАВИШИ BLENDER</a>", "<a href='https://docs.blender.org/manual/en/latest/interface/keymap/blender_default.html' target='_blank'>BLENDER KEYBOARD SHORTCUTS</a>"], data: [
@@ -1035,241 +992,140 @@
                 ["Изменение размера", "Resize", "Alt + Drag", "Opt + Drag"]
             ]]
         ]},
-        au: { id: "au", logo: "AU", title: "ADOBE AUDITION", color: "#0f766e", meta: ["<a href='https://helpx.adobe.com/ru/audition/using/default-keyboard-shortcuts.html' target='_blank'>ГОРЯЧИЕ КЛАВИШИ ADOBE AUDITION</a>", "<a href='https://helpx.adobe.com/en/audition/using/default-keyboard-shortcuts.html' target='_blank'>ADOBE AUDITION KEYBOARD SHORTCUTS</a>"], data: [
-            ["Навигация и Зум", "Navigation & Zoom", [
-                ["Waveform / Multitrack", "Waveform / Multitrack", "1", "1"],
-                ["Включить Waveform", "Switch to Waveform", "9", "9"],
-                ["Включить Multitrack", "Switch to Multitrack", "0", "0"],
-                ["Уместить проект", "Zoom Out Full", "\\", "\\"],
-                ["Масштаб по горизонтали", "Zoom In Horizontally", "=", "="],
-                ["Масштаб по вертикали", "Zoom In Vertically", "Alt + =", "Opt + ="],
-                ["К началу / концу проекта", "Go to Start / End", "Home / End", "Home / End"],
-                ["Возврат плейхеда (Стоп)", "Return Playhead on Stop", "Shift + X", "Shift + X"]
+        cb: { id: "cb", logo: "CB", title: "CENT BROWSER", color: "#1d4ed8", meta: ["<a href='https://support.google.com/chrome/answer/157179' target='_blank'>ГОРЯЧИЕ КЛАВИШИ CHROME</a>", "<a href='https://support.google.com/chrome/answer/157179' target='_blank'>CHROME KEYBOARD SHORTCUTS</a>"], data: [
+            ["Вкладки и навигация", "Tabs & Navigation", [
+                ["Новая вкладка", "New Tab", "Ctrl + T", "Cmd + T"],
+                ["Новое окно", "New Window", "Ctrl + N", "Cmd + N"],
+                ["Новое окно Инкогнито", "New Incognito Window", "Ctrl + Shift + N", "Cmd + Shift + N"],
+                ["Мультилогин вкладка", "Multi-login Tab", "Ctrl + M", "Cmd + M"],
+                ["На вкладку слева", "Previous Tab", "Ctrl + Shift + Tab", "Cmd + Opt + ←"],
+                ["На вкладку справа", "Next Tab", "Ctrl + Tab", "Cmd + Opt + →"],
+                ["Закрыть текущую вкладку", "Close Tab", "Ctrl + W", "Cmd + W"],
+                ["Открыть закрытую вкладку", "Reopen Closed Tab", "Ctrl + Shift + T", "Cmd + Shift + T"],
+                ["Дублировать вкладку", "Duplicate Tab", "Alt + U", "Opt + U"],
+                ["Закрепить / Открепить", "Pin / Unpin Tab", "Alt + N", "Opt + N"],
+                ["Вкл / Откл звук вкладки", "Mute / Unmute Tab", "Alt + M", "Opt + M"],
+                ["На первую вкладку", "First Tab", "Ctrl + 1", "Cmd + 1"],
+                ["На последнюю вкладку", "Last Tab", "Ctrl + 9", "Cmd + 9"],
+                ["Предыдущая страница", "Back (History)", "Alt + ←", "Cmd + ["],
+                ["Следующая страница", "Forward (History)", "Alt + →", "Cmd + ]"]
             ]],
-            ["Инструменты", "Tools", [
-                ["Выделение времени", "Time Selection", "T", "T"],
-                ["Перемещение (Move)", "Move Tool", "V", "V"],
-                ["Лезвие (Razor)", "Razor Tool", "R", "R"],
-                ["Прокрутка клипа (Slip)", "Slip Tool", "Y", "Y"],
-                ["Восстанавливающая кисть", "Spot Healing Brush", "A", "A"],
-                ["Выделение области", "Marquee Selection", "E", "E"],
-                ["Кисть (Paintbrush)", "Paintbrush Tool", "B", "B"]
+            ["Данные страницы", "Page Data", [
+                ["Перезагрузить", "Reload Page", "F5", "Cmd + R"],
+                ["Жесткая перезагрузка", "Hard Reload", "Ctrl + F5", "Cmd + Shift + R"],
+                ["Очистка кэша/данных", "Clear Browsing Data", "Ctrl + Shift + Del", "Cmd + Shift + Bksp"],
+                ["Копировать URL", "Copy URL", "Alt + C", "Cmd + L, Cmd + C"],
+                ["Копировать URL и Title", "Copy URL and Title", "Alt + L", "Opt + L"],
+                ["Открыть URL из буфера", "Open URL from Clipboard", "Alt + T", "Opt + T"],
+                ["Переключить курсор (Caret)", "Toggle Caret Browsing", "F7", "F7"],
+                ["Увеличить масштаб", "Zoom In", "Ctrl + +", "Cmd + +"],
+                ["Уменьшить масштаб", "Zoom Out", "Ctrl + -", "Cmd + -"],
+                ["Сбросить масштаб", "Reset Zoom", "Ctrl + 0", "Cmd + 0"],
+                ["К адресной строке", "Focus Address Bar", "Alt + D", "Cmd + L"],
+                ["В закладки", "Bookmark Page", "Ctrl + D", "Cmd + D"],
+                ["Все вкладки в закладки", "Bookmark All Tabs", "Ctrl + Shift + D", "Cmd + Shift + D"]
             ]],
-            ["Воспроизведение", "Playback & Markers", [
-                ["Воспроизведение / Пауза", "Play / Pause", "Space", "Space"],
-                ["Плей от выделения до конца", "Play from Selection", "Shift + Space", "Shift + Space"],
-                ["Запись со вставкой (Punch)", "Punch & Roll Record", "Shift + Alt + Space", "Shift + Opt + Space"],
-                ["Поставить маркер", "Add Marker", "M / *", "M / *"],
-                ["Прыжок по маркерам", "Go to Next/Prev Marker", "Ctrl + ← / →", "Cmd + ← / →"],
-                ["Вкл/Выкл привязку", "Snapping", "S", "S"]
-            ]],
-            ["Редактура и Эффекты", "Editing & Effects", [
-                ["Захват профиля шума", "Capture Noise Print", "Shift + P", "Shift + P"],
-                ["Повтор эффекта (Настр.)", "Repeat Last Effect (UI)", "Shift + R", "Shift + R"],
-                ["Повтор эффекта (Сразу)", "Repeat Last Effect", "Ctrl + R", "Cmd + R"],
-                ["Авто-восстановление", "Auto-Heal", "Ctrl + U", "Cmd + U"],
-                ["Вставить в новый файл", "Paste to New File", "Alt + Shift + V", "Opt + Shift + V"],
-                ["Вставить с микшированием", "Mix Paste", "Ctrl + Shift + V", "Cmd + Shift + V"],
-                ["Вставить тишину", "Insert Silence", "Shift + Del", "Shift + Del"],
-                ["Показать спектрограмму", "Spectral Frequency Disp.", "Shift + D", "Shift + D"]
-            ]],
-            ["Мультитрек и Сведение", "Multitrack & Mix", [
-                ["Разрезать клип", "Split Clip", "Ctrl + K", "Cmd + K"],
-                ["Сдвинуть клип влево / вправо", "Nudge Clip", "Alt + , / .", "Opt + , / ."],
-                ["Перекинуть клип на трек ↑/↓", "Nudge Clip Up/Down", "Alt + ↑ / ↓", "Opt + ↑ / ↓"],
-                ["Группировка клипов", "Group Clips", "Ctrl + G", "Cmd + G"],
-                ["Вкл/Откл Mute/Solo на всех", "Toggle All Mute/Solo", "Ctrl + Shift + Клик", "Cmd + Shift + Click"],
-                ["Плавная регулировка огиб.", "Adjust Envelope Fine", "Ctrl + Drag", "Cmd + Drag"],
-                ["Крупная регулировка огиб.", "Adjust Envelope Coarse", "Shift + Drag", "Shift + Drag"]
+            ["Инструменты и панели", "Tools & Panels", [
+                ["Показать меню закладок", "Bookmarks Menu", "Alt + B", "Opt + B"],
+                ["Вкл / Выкл панель закладок", "Toggle Bookmarks Bar", "Ctrl + Shift + B", "Cmd + Shift + B"],
+                ["Открыть страницу в IE", "Open Page in IE", "Ctrl + Shift + E", "Cmd + Shift + E"],
+                ["Сохранить страницу как...", "Save Page As...", "Ctrl + S", "Cmd + S"],
+                ["Сохранить как изображение", "Save Page as Image", "Alt + I", "Opt + I"],
+                ["Скриншот всей страницы", "Screenshot Full Page", "Alt + Shift + I", "Opt + Shift + I"],
+                ["Полноэкранный режим", "Toggle Fullscreen", "F11", "Cmd + Ctrl + F"],
+                ["Настройки", "Settings", "Alt + S", "Cmd + ,"],
+                ["Загрузки", "Downloads", "Ctrl + J", "Cmd + Shift + J"],
+                ["История", "History", "Ctrl + H", "Cmd + Y"],
+                ["Диспетчер задач Chrome", "Task Manager", "Shift + Esc", "Cmd + Opt + Esc"],
+                ["Инструменты разработчика", "Developer Tools", "Ctrl + Shift + I", "Cmd + Opt + I"],
+                ["Проверить элементы", "Inspect Element", "Ctrl + Shift + C", "Cmd + Opt + C"],
+                ["Консоль JavaScript", "JS Console", "Ctrl + Shift + J", "Cmd + Opt + J"]
             ]]
         ]},
-        ae: { id: "ae", logo: "AE", title: "ADOBE AFTER EFFECTS", color: "#c084fc", meta: ["<a href='https://helpx.adobe.com/ru/after-effects/using/keyboard-shortcuts-reference.html' target='_blank'>ГОРЯЧИЕ КЛАВИШИ ADOBE AFTER EFFECTS</a>", "<a href='https://helpx.adobe.com/en/after-effects/using/keyboard-shortcuts-reference.html' target='_blank'>ADOBE AFTER EFFECTS KEYBOARD SHORTCUTS</a>"], data: [
-            ["Свойства слоя", "Layer Properties", [
-                ["Position (Позиция)", "Position", "P", "P"],
-                ["Scale (Масштаб)", "Scale", "S", "S"],
-                ["Rotation (Вращение)", "Rotation", "R", "R"],
-                ["Opacity (Непрозрачн.)", "Opacity", "T", "T"],
-                ["Anchor Point (Якорная точка)", "Anchor Point", "A", "A"],
-                ["Свойства с ключами", "Reveal Keyframes", "U", "U"],
-                ["Измененные свойства", "Reveal Modified Props", "U U", "U U"],
-                ["Эффекты", "Effects", "E", "E"],
-                ["Форма маски (Mask Path)", "Mask Path", "M", "M"],
-                ["Все свойства маски", "All Mask Properties", "M M", "M M"],
-                ["Растушевка маски", "Mask Feather", "F", "F"],
-                ["Выражения (Expressions)", "Reveal Expressions", "E E", "E E"],
-                ["Уровень звука (Audio Levels)", "Audio Levels", "L", "L"],
-                ["Волна звука (Waveform)", "Audio Waveform", "L L", "L L"],
-                ["Добавить свойство", "Add Property to View", "Shift + Кнопка", "Shift + Key"]
+        da: { id: "da", logo: "DR", title: "DAVINCI RESOLVE", color: "#c2410c", meta: ["<a href='https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion' target='_blank'>ГОРЯЧИЕ КЛАВИШИ DAVINCI RESOLVE</a>", "<a href='https://www.blackmagicdesign.com/support/family/davinci-resolve-and-fusion' target='_blank'>DAVINCI RESOLVE KEYBOARD SHORTCUTS</a>"], data: [
+            ["Интерфейс", "Interface & Pages", [
+                ["Настройки пользователя", "User Preferences", "Ctrl + ,", "Cmd + ,"],
+                ["Настройки проекта", "Project Settings", "Shift + 9", "Shift + 9"],
+                ["Вкладка Media", "Media Page", "Shift + 2", "Shift + 2"],
+                ["Вкладка Cut", "Cut Page", "Shift + 3", "Shift + 3"],
+                ["Вкладка Edit", "Edit Page", "Shift + 4", "Shift + 4"],
+                ["Вкладка Fusion", "Fusion Page", "Shift + 5", "Shift + 5"],
+                ["Вкладка Color", "Color Page", "Shift + 6", "Shift + 6"],
+                ["Вкладка Fairlight", "Fairlight Page", "Shift + 7", "Shift + 7"],
+                ["Вкладка Deliver", "Deliver Page", "Shift + 8", "Shift + 8"],
+                ["Во весь экран (Cinema)", "Cinema Viewer", "Ctrl + F", "Cmd + F"],
+                ["Расширенный экран (Color)", "Enhanced Viewer", "Alt + F", "Opt + F"]
             ]],
-            ["Работа со слоями", "Layer Manipulation", [
-                ["Разрезать слой", "Split Layer", "Ctrl + Shift + D", "Cmd + Shift + D"],
-                ["Обрезать слой слева", "Trim In Point", "Alt + [", "Opt + ["],
-                ["Обрезать слой справа", "Trim Out Point", "Alt + ]", "Opt + ]"],
-                ["Сдвинуть начало к плейхеду", "Move In Point to CTI", "[", "["],
-                ["Сдвинуть конец к плейхеду", "Move Out Point to CTI", "]", "]"],
-                ["Сдвинуть слой на 1 кадр", "Nudge Layer 1 Frame", "Alt + PgUp / PgDn", "Opt + PgUp / PgDn"],
-                ["Сдвиг слоя на 10 кадров", "Nudge Layer 10 Frames", "Alt + Shift + PgUp/Dn", "Opt + Shift + PgUp/Dn"],
-                ["Слой выше / ниже", "Move Layer Up/Down", "Ctrl + [ / ]", "Cmd + [ / ]"],
-                ["Слой в самый верх/низ", "Move Layer Top/Bottom", "Ctrl + Shift + [ / ]", "Cmd + Shift + [ / ]"],
-                ["Дублировать слой", "Duplicate Layer", "Ctrl + D", "Cmd + D"],
-                ["Прекомпоз (Pre-comp)", "Pre-compose", "Ctrl + Shift + C", "Cmd + Shift + C"],
-                ["Замена слоя с атрибут.", "Replace Layer (Retain)", "Alt + Drag", "Opt + Drag"]
+            ["Метки и Навигация", "Markers & Navigation", [
+                ["Точка Входа / Выхода", "Mark In / Out", "I / O", "I / O"],
+                ["Снять выделение In/Out", "Clear In/Out", "Alt + X", "Opt + X"],
+                ["In/Out по краям клипа", "Mark Clip", "X", "X"],
+                ["Поставить маркер", "Add Marker", "M", "M"],
+                ["Изменить маркер", "Modify Marker", "Double M", "Double M"],
+                ["Уместить таймлайн", "Zoom to Fit", "Shift + Z", "Shift + Z"],
+                ["Масштаб таймлайна (+ / -)", "Zoom In/Out", "Ctrl + = / -", "Cmd + = / -"],
+                ["Плей / Пауза", "Play / Pause", "Space", "Space"],
+                ["Вперед/Назад (Shuttle)", "Shuttle", "J / K / L", "J / K / L"]
             ]],
-            ["Таймлайн и Навигация", "Timeline Navigation", [
-                ["К началу/концу слоя", "Go to In/Out Point", "I / O", "I / O"],
-                ["К пред./след. ключу", "Next/Prev Keyframe", "J / K", "J / K"],
-                ["Шаг на 1 кадр", "Move 1 Frame", "PgDn / PgUp", "PgDn / PgUp"],
-                ["Шаг на 10 кадров", "Move 10 Frames", "Shift + PgDn / PgUp", "Shift + PgDn / PgUp"],
-                ["Начало рабочей области", "Work Area In Point", "B", "B"],
-                ["Конец рабочей области", "Work Area Out Point", "N", "N"],
-                ["Центрировать плейхед", "Center at Playhead", "D", "D"],
-                ["Перейти к времени", "Go to Time", "Alt + Shift + J", "Opt + Shift + J"],
-                ["Маркер на слой", "Add Marker", "Num *", "Num *"],
-                ["Маркер с настройками", "Add Marker with Settings", "Alt + Num *", "Opt + Num *"],
-                ["Масштаб до кадров (Zoom)", "Zoom to Frame", ";", ";"],
-                ["Поиск по таймлайну", "Search Timeline", "Ctrl + F", "Cmd + F"]
+            ["EDIT: Монтаж", "EDIT: Editing", [
+                ["Обычный курсор", "Normal Edit Mode", "A", "A"],
+                ["Лезвие (Blade)", "Blade", "B", "B"],
+                ["Динамический тримминг", "Dynamic Trim Mode", "W", "W"],
+                ["Выделить вперед (текущая)", "Select Clips Forward", "Y", "Y"],
+                ["Выделить вперед (все)", "Select All Forward", "Alt + Y", "Opt + Y"],
+                ["Выделить назад (текущая)", "Select Clips Backward", "Ctrl + Y", "Cmd + Y"],
+                ["Выделить назад (все)", "Select All Backward", "Ctrl + Alt + Y", "Cmd + Opt + Y"],
+                ["Разрезать клип", "Split Clip", "Ctrl + \\ / B", "Cmd + \\ / B"],
+                ["Связь видео и звука", "Link/Unlink", "Ctrl + Shift + L", "Cmd + Shift + L"],
+                ["Вставить (Insert)", "Insert", "F9", "F9"],
+                ["Перезаписать (Overwrite)", "Overwrite", "F10", "F10"],
+                ["Заменить (Replace)", "Replace", "F11", "F11"],
+                ["На верхнюю дорожку", "Place on Top", "F12", "F12"],
+                ["Вставить в конец (Append)", "Append at End", "Shift + F12", "Shift + F12"],
+                ["Свойства клипа (Inspector)", "Inspector", "Alt + 1", "Cmd + 1"]
             ]],
-            ["Ключи и Анимация", "Keyframes & Animation", [
-                ["Плавный старт/стоп", "Easy Ease", "F9", "F9"],
-                ["Плавный вход (Ease In)", "Easy Ease In", "Shift + F9", "Shift + F9"],
-                ["Плавный выход (Ease Out)", "Easy Ease Out", "Ctrl + Shift + F9", "Cmd + Shift + F9"],
-                ["Редактор графиков", "Graph Editor", "Shift + F3", "Shift + F3"],
-                ["Добавить выражение", "Add Expression", "Alt + Клик (Часы)", "Opt + Click (Watch)"],
-                ["Интерполяция ключей", "Keyframe Interpolation", "Ctrl + Alt + K", "Cmd + Opt + K"],
-                ["Копировать связи", "Copy Expression Links", "Ctrl + Alt + C", "Cmd + Opt + C"]
+            ["EDIT: Тримминг", "EDIT: Trimming", [
+                ["Удалить (оставить пустоту)", "Delete", "Bksp", "Del"],
+                ["Удалить со сдвигом", "Ripple Delete", "Shift + Bksp", "Shift + Del"],
+                ["Срезать слева до плейхеда", "Ripple Start to Playhead", "Ctrl + Shift + [", "Cmd + Shift + ["],
+                ["Срезать справа до плейхеда", "Ripple End to Playhead", "Ctrl + Shift + ]", "Cmd + Shift + ]"],
+                ["Сдвинуть клип на 1 кадр", "Nudge 1 Frame", ", / .", ", / ."],
+                ["Сдвинуть на 5 кадров", "Nudge 5 Frames", "Shift + , / .", "Shift + , / ."],
+                ["Изменение скорости (Retime)", "Retime Controls", "Ctrl + R", "Cmd + R"],
+                ["Добавить переход", "Add Transition", "Ctrl + T", "Cmd + T"],
+                ["Копировать атрибуты", "Copy Attributes", "Ctrl + C", "Cmd + C"],
+                ["Вставить атрибуты", "Paste Attributes", "Alt + V", "Opt + V"]
             ]],
-            ["Инструменты", "Tools", [
-                ["Курсор (Selection)", "Selection Tool", "V", "V"],
-                ["Рука (Hand Tool)", "Hand Tool", "H / Space", "H / Space"],
-                ["Вращение (Rotation)", "Rotation Tool", "W", "W"],
-                ["Якорная точка (Pan Behind)", "Pan Behind Tool", "Y", "Y"],
-                ["Шейпы и Маски", "Shape / Mask Tool", "Q", "Q"],
-                ["Перо (Pen Tool)", "Pen Tool", "G", "G"],
-                ["Камера (Camera Tool)", "Camera Tool", "C", "C"],
-                ["Текст (Type Tool)", "Type Tool", "Ctrl + T", "Cmd + T"],
-                ["Кисть ротоскопинга (Roto)", "Roto Brush", "Alt + W", "Opt + W"],
-                ["Марионеточная деформ.", "Puppet Pin Tool", "Ctrl + P", "Cmd + P"]
+            ["COLOR: Цвет", "COLOR: Grading", [
+                ["Добавить Serial Node", "Add Serial Node", "Alt + S", "Opt + S"],
+                ["Добавить Serial Before", "Add Serial Before", "Shift + S", "Shift + S"],
+                ["Добавить Parallel Node", "Add Parallel Node", "Alt + P", "Opt + P"],
+                ["Добавить Layer Node", "Add Layer Node", "Alt + L", "Opt + L"],
+                ["Добавить Outside Node", "Add Outside Node", "Alt + O", "Opt + O"],
+                ["Добавить Splitter/Combiner", "Add Splitter/Combiner", "Alt + Y", "Opt + Y"],
+                ["Вкл/Выкл одну ноду", "Disable Node", "Ctrl + D", "Cmd + D"],
+                ["Вкл/Выкл все ноды (Bypass)", "Bypass Color Grades", "Shift + D", "Shift + D"],
+                ["Сбросить одну ноду", "Reset Node Grade", "Shift + Home", "Shift + Home"],
+                ["Сбросить все ноды", "Reset All Grades", "Ctrl + Home", "Cmd + Home"],
+                ["Предыдущий клип", "Previous Clip", "Up", "Up"],
+                ["Следующий клип", "Next Clip", "Down", "Down"],
+                ["Копировать грейд (с пред.)", "Apply Grade from Prev", "Middle Click / =", "Middle Click / ="],
+                ["Сравнение До/После", "Wipe Timeline Clip", "Ctrl + W", "Cmd + W"],
+                ["Трекинг маски вперёд", "Track Forward", "Ctrl + T", "Cmd + T"],
+                ["Трекинг назад", "Track Reverse", "Ctrl + Shift + T", "Cmd + Shift + T"]
             ]],
-            ["Подгонка и Центрирование", "Fit & Centering", [
-                ["Якорь в центр слоя", "Anchor Point to Center", "Ctrl + Alt + Home", "Cmd + Opt + Home"],
-                ["Слой в центр композа", "Layer to Center", "Ctrl + Home", "Cmd + Home"],
-                ["Слой под размер", "Fit to Comp", "Ctrl + Alt + F", "Cmd + Opt + F"],
-                ["Подогнать под ширину", "Fit to Comp Width", "Ctrl + Alt + Shift + H", "Cmd + Opt + Shift + H"],
-                ["Подогнать под высоту", "Fit to Comp Height", "Ctrl + Alt + Shift + G", "Cmd + Opt + Shift + G"]
+            ["FUSION: Ноды", "FUSION: Node Graph", [
+                ["Меню выбора/создания ноды", "Add Tool / Node Menu", "Shift + Space", "Shift + Space"],
+                ["Вывод во Viewer 1-4 / Out", "Route to Viewer 1-4", "1 - 4", "1 - 4"],
+                ["Отключить ноду (Pass Through)", "Pass Through", "Ctrl + P", "Cmd + P"],
+                ["Группировать ноды", "Group Nodes", "Ctrl + G", "Cmd + G"],
+                ["Масштаб нод к 100%", "Zoom 100%", "Ctrl + 1", "Cmd + 1"]
             ]],
-            ["Рендер и UI", "Render & UI", [
-                ["Настройки композиции", "Composition Settings", "Ctrl + K", "Cmd + K"],
-                ["Скрыть всё кроме превью", "Hide Panels", "Ctrl + \\", "Cmd + \\"],
-                ["Панель на весь экран", "Maximize Panel", "~", "~"],
-                ["Блок рендера (Refresh)", "Disable Rendering", "Caps Lock", "Caps Lock"],
-                ["RAM Preview", "RAM Preview", "Num 0", "Num 0"],
-                ["Очистить кэш (Purge)", "Purge All Memory", "Ctrl + Alt + Num 0", "Cmd + Opt + Num 0"],
-                ["Добавить в очередь рендера", "Add to Render Queue", "Ctrl + M", "Cmd + M"],
-                ["Рендер в Media Encoder", "Add to Media Encoder", "Ctrl + Alt + M", "Cmd + Opt + M"],
-                ["Сохранить текущий кадр", "Save Frame As", "Ctrl + Alt + S", "Cmd + Opt + S"],
-                ["Мини-схема (Mini Flowchart)", "Mini Flowchart", "Tab", "Tab"]
-            ]]
-        ]},
-        ps: { id: "ps", logo: "PS", title: "ADOBE PHOTOSHOP", color: "#38bdf8", meta: ["<a href='https://helpx.adobe.com/ru/photoshop/desktop/get-started/settings-and-preferences/view-keyboard-shortcuts.html' target='_blank'>ГОРЯЧИЕ КЛАВИШИ ADOBE PHOTOSHOP</a>", "<a href='https://helpx.adobe.com/en/photoshop/using/default-keyboard-shortcuts.html' target='_blank'>ADOBE PHOTOSHOP KEYBOARD SHORTCUTS</a>"], data: [
-            ["Инструменты", "Tools", [
-                ["Перемещение (Move)", "Move Tool", "V", "V"],
-                ["Прямоуг. / Овал. область", "Marquee Tool", "M", "M"],
-                ["Лассо (Lasso)", "Lasso Tool", "L", "L"],
-                ["Быстрое выделение", "Quick Selection Tool", "W", "W"],
-                ["Рамка / Кадрирование", "Crop Tool", "C", "C"],
-                ["Пипетка (Eyedropper)", "Eyedropper", "I", "I"],
-                ["Восстанавливающая кисть", "Spot Healing Brush", "J", "J"],
-                ["Кисть / Карандаш (Brush)", "Brush Tool", "B", "B"],
-                ["Штамп (Clone Stamp)", "Clone Stamp Tool", "S", "S"],
-                ["Архивная кисть (History)", "History Brush", "Y", "Y"],
-                ["Ластик (Eraser)", "Eraser Tool", "E", "E"],
-                ["Градиент / Заливка", "Gradient / Paint Bucket", "G", "G"],
-                ["Осветлитель / Затемнитель", "Dodge / Burn", "O", "O"],
-                ["Перо (Pen)", "Pen Tool", "P", "P"],
-                ["Текст (Type)", "Type Tool", "T", "T"],
-                ["Выделение контура", "Path Selection", "A", "A"],
-                ["Фигуры (Shapes)", "Shape Tool", "U", "U"],
-                ["Рука (Hand)", "Hand Tool", "H / Space", "H / Space"],
-                ["Поворот вида", "Rotate View Tool", "R", "R"],
-                ["Перебор в группе инстр.", "Cycle Tool Group", "Shift + Буква", "Shift + Letter"]
-            ]],
-            ["Слои (Layers)", "Layers", [
-                ["Новый пустой слой", "New Layer", "Ctrl + Shift + N", "Cmd + Shift + N"],
-                ["Новый слой (без окна)", "New Layer (No Dialog)", "Ctrl + Alt + Shift + N", "Cmd + Opt + Shift + N"],
-                ["Дублировать слой", "Duplicate Layer", "Ctrl + J", "Cmd + J"],
-                ["Вырезать на новый слой", "Layer via Cut", "Ctrl + Shift + J", "Cmd + Shift + J"],
-                ["Сгруппировать слои", "Group Layers", "Ctrl + G", "Cmd + G"],
-                ["Разгруппировать", "Ungroup Layers", "Ctrl + Shift + G", "Cmd + Shift + G"],
-                ["Объединить выделенные", "Merge Layers", "Ctrl + E", "Cmd + E"],
-                ["Объединить видимые", "Merge Visible", "Ctrl + Shift + E", "Cmd + Shift + E"],
-                ["Слить видимые (Stamp)", "Stamp Visible", "Ctrl + Alt + Shift + E", "Cmd + Opt + Shift + E"],
-                ["Переместить слой вверх / вниз", "Move Layer Up/Down", "Ctrl + [ / ]", "Cmd + [ / ]"],
-                ["Переместить в самый верх", "Move Layer Top/Bottom", "Ctrl + Shift + [ / ]", "Cmd + Shift + [ / ]"],
-                ["Выбрать слой выше / ниже", "Select Layer Up/Down", "Alt + [ / ]", "Opt + [ / ]"],
-                ["Добавить к выделению", "Add Layer to Selection", "Alt + Shift + [ / ]", "Opt + Shift + [ / ]"],
-                ["Обтравочная маска", "Clipping Mask", "Ctrl + Alt + G", "Cmd + Opt + G"],
-                ["Непрозрачность (Opacity)", "Layer Opacity", "1 - 0", "1 - 0"],
-                ["Заливка (Fill)", "Layer Fill", "Shift + 1 - 0", "Shift + 1 - 0"],
-                ["Перебор режимов наложения", "Cycle Blend Modes", "Shift + +/-", "Shift + +/-"]
-            ]],
-            ["Выделение и Маски", "Selection & Masks", [
-                ["Выделить всё", "Select All", "Ctrl + A", "Cmd + A"],
-                ["Снять выделение", "Deselect", "Ctrl + D", "Cmd + D"],
-                ["Вернуть выделение", "Reselect", "Ctrl + Shift + D", "Cmd + Shift + D"],
-                ["Инвертировать выделение", "Inverse Selection", "Ctrl + Shift + I", "Cmd + Shift + I"],
-                ["Растушевка (Feather)", "Feather Selection", "Shift + F6", "Shift + F6"],
-                ["Выделить пиксели слоя", "Load Selection", "Ctrl + Клик (Иконка)", "Cmd + Click (Icon)"],
-                ["Режим быстрой маски", "Quick Mask Mode", "Q", "Q"],
-                ["Показать только маску", "Show Mask Only", "Alt + Клик (Маска)", "Opt + Click (Mask)"],
-                ["Вкл/Откл маску слоя", "Disable Mask", "Shift + Клик (Маска)", "Shift + Click (Mask)"]
-            ]],
-            ["Трансформация", "Transforms", [
-                ["Свободное трансформирование", "Free Transform", "Ctrl + T", "Cmd + T"],
-                ["Трансформ. с копией", "Transform with Copy", "Ctrl + Alt + T", "Cmd + Opt + T"],
-                ["Повтор трансформ.", "Repeat Transform", "Ctrl + Shift + T", "Cmd + Shift + T"],
-                ["Повтор с копией", "Repeat Transform (Copy)", "Ctrl + Alt + Shift + T", "Cmd + Opt + Shift + T"],
-                ["Искажение (Distort)", "Distort", "Ctrl + Drag (Угол)", "Cmd + Drag (Corner)"],
-                ["Симметрия (Perspective)", "Perspective", "Ctrl+Alt+Shift+Drag", "Cmd+Opt+Shift+Drag"]
-            ]],
-            ["Кисти и Цвета", "Brushes & Colors", [
-                ["Размер кисти", "Brush Size", "[ / ]", "[ / ]"],
-                ["Жесткость кисти", "Brush Hardness", "Shift + [ / ]", "Shift + [ / ]"],
-                ["Размер/жесткость (HUD)", "HUD Brush Resize", "Alt + ПКМ + Drag", "Ctrl + Opt + Drag"],
-                ["Сбросить цвета (ч/б)", "Default Colors (D)", "D", "D"],
-                ["Поменять цвета местами", "Switch Colors", "X", "X"],
-                ["Залить передним цветом", "Fill Foreground Color", "Alt + Bksp", "Opt + Del"],
-                ["Залить задним цветом", "Fill Background Color", "Ctrl + Bksp", "Cmd + Del"],
-                ["Заливка (с прозрачн.)", "Fill (Preserve Transp.)", "Shift + Alt + Bksp", "Shift + Opt + Del"]
-            ]],
-            ["Цвет и Фильтры", "Color & Filters", [
-                ["Уровни (Levels)", "Levels", "Ctrl + L", "Cmd + L"],
-                ["Кривые (Curves)", "Curves", "Ctrl + M", "Cmd + M"],
-                ["Тон / Насыщенность", "Hue/Saturation", "Ctrl + U", "Cmd + U"],
-                ["Цветовой баланс", "Color Balance", "Ctrl + B", "Cmd + B"],
-                ["Обесцветить", "Desaturate", "Ctrl + Shift + U", "Cmd + Shift + U"],
-                ["Инвертировать цвета", "Invert Colors", "Ctrl + I", "Cmd + I"],
-                ["Черно-белое", "Black & White", "Ctrl + Alt + Shift + B", "Cmd + Opt + Shift + B"],
-                ["Автотон", "Auto Tone", "Ctrl + Shift + L", "Cmd + Shift + L"],
-                ["Автоконтраст", "Auto Contrast", "Ctrl + Alt + Shift + L", "Cmd + Opt + Shift + L"],
-                ["Авто-цветокоррекция", "Auto Color", "Ctrl + Shift + B", "Cmd + Shift + B"],
-                ["Повтор фильтра", "Last Filter", "Ctrl + Alt + F", "Cmd + Opt + F"],
-                ["Пластика (Liquify)", "Liquify", "Ctrl + Shift + X", "Cmd + Shift + X"],
-                ["Camera Raw Filter", "Camera Raw Filter", "Ctrl + Shift + A", "Cmd + Shift + A"]
-            ]],
-            ["Интерфейс и Файлы", "Interface & Files", [
-                ["Скрыть/Показать UI", "Toggle UI", "Tab", "Tab"],
-                ["Скрыть/Показать правые панели", "Toggle Right Panels", "Shift + Tab", "Shift + Tab"],
-                ["Переключение режимов экрана", "Screen Modes", "F", "F"],
-                ["Реальный размер пикселей", "100% Zoom", "Ctrl + 1", "Cmd + 1"],
-                ["Подогнать под размер экрана", "Fit on Screen", "Ctrl + 0", "Cmd + 0"],
-                ["Вкл/Откл линейки", "Toggle Rulers", "Ctrl + R", "Cmd + R"],
-                ["Вкл/Откл направляющие", "Toggle Guides", "Ctrl + ;", "Cmd + ;"],
-                ["Вкл/Откл сетку", "Toggle Grid", "Ctrl + '", "Cmd + '"],
-                ["Сохранить как", "Save As", "Ctrl + Shift + S", "Cmd + Shift + S"],
-                ["Экспортировать как...", "Export As...", "Ctrl + Alt + Shift + W", "Cmd + Opt + Shift + W"],
-                ["Сохранить для Web", "Save for Web", "Ctrl + Alt + Shift + S", "Cmd + Opt + Shift + S"],
-                ["Закрыть текущий документ", "Close Document", "Ctrl + W", "Cmd + W"],
-                ["Закрыть все документы", "Close All", "Ctrl + Alt + W", "Cmd + Opt + W"]
+            ["FAIRLIGHT: Звук", "FAIRLIGHT: Audio", [
+                ["Запись звука", "Start Recording", "Shift + R", "Shift + R"],
+                ["Микшер", "Toggle Mixer", "Shift + M", "Shift + M"],
+                ["Автоматизация", "Toggle Automation", "Ctrl + Alt + A", "Cmd + Opt + A"],
+                ["Приглушить дорожку (Mute)", "Mute Track", "Shift + T", "Shift + T"]
             ]]
         ]},
         ex: { id: "ex", logo: "EX", title: "EXPORT SETTINGS", color: "#10b981", meta: ["<a href='https://www.shutterencoder.com/' target='_blank'>САЙТ SHUTTER ENCODER</a>", "<a href='https://www.shutterencoder.com/' target='_blank'>SHUTTER ENCODER SITE</a>"], data: [
@@ -1570,6 +1426,179 @@
                 ["Оцифровка 16/35mm", "16mm/35mm Digitization", "Custom"]
             ]]
         ]},
+        gd: { id: "gd", logo: "GD", title: "GOOGLE DOCS", color: "#1a73e8", meta: ["<a href='https://support.google.com/docs/answer/179738' target='_blank'>ГОРЯЧИЕ КЛАВИШИ GOOGLE DOCS</a>", "<a href='https://support.google.com/docs/answer/179738' target='_blank'>GOOGLE DOCS KEYBOARD SHORTCUTS</a>"], data: [
+            ["Общие действия", "General Actions", [
+                ["Копировать", "Copy", "Ctrl + C", "Cmd + C"],
+                ["Вырезать", "Cut", "Ctrl + X", "Cmd + X"],
+                ["Вставить", "Paste", "Ctrl + V", "Cmd + V"],
+                ["Вставить без форматов", "Paste without formatting", "Ctrl + Shift + V", "Cmd + Shift + V"],
+                ["Отменить действие", "Undo", "Ctrl + Z", "Cmd + Z"],
+                ["Повторить действие", "Redo", "Ctrl + Y", "Cmd + Y"],
+                ["Найти", "Find", "Ctrl + F", "Cmd + F"],
+                ["Найти и заменить", "Find and Replace", "Ctrl + H", "Cmd + Shift + H"],
+                ["Вставить ссылку", "Insert Link", "Ctrl + K", "Cmd + K"],
+                ["Открыть ссылку", "Open Link", "Alt + Enter", "Opt + Return"],
+                ["Печать", "Print", "Ctrl + P", "Cmd + P"],
+                ["Словарь / Определение", "Dictionary", "Ctrl + Shift + Y", "Cmd + Shift + Y"],
+                ["Статистика (символы)", "Word Count", "Ctrl + Shift + C", "Cmd + Shift + C"],
+                ["Разрыв страницы", "Insert Page Break", "Ctrl + Enter", "Cmd + Return"],
+                ["Скрыть меню (компакт)", "Compact Controls", "Ctrl + Shift + F", "Ctrl + Shift + F"],
+                ["Все горячие клавиши", "Shortcuts List", "Ctrl + /", "Cmd + /"]
+            ]],
+            ["Формат текста", "Text Formatting", [
+                ["Жирный", "Bold", "Ctrl + B", "Cmd + B"],
+                ["Курсив", "Italic", "Ctrl + I", "Cmd + I"],
+                ["Подчеркнутый", "Underline", "Ctrl + U", "Cmd + U"],
+                ["Зачеркнутый", "Strikethrough", "Alt + Shift + 5", "Cmd + Shift + X"],
+                ["Надстрочный текст", "Superscript", "Ctrl + .", "Cmd + ."],
+                ["Подстрочный текст", "Subscript", "Ctrl + ,", "Cmd + ,"],
+                ["Копировать формат", "Copy Formatting", "Ctrl + Alt + C", "Cmd + Opt + C"],
+                ["Вставить формат", "Paste Formatting", "Ctrl + Alt + V", "Cmd + Opt + V"],
+                ["Очистить формат", "Clear Formatting", "Ctrl + \\", "Cmd + \\"],
+                ["Увеличить размер шрифта", "Increase Font Size", "Ctrl + Shift + .", "Cmd + Shift + ."],
+                ["Уменьшить размер шрифта", "Decrease Font Size", "Ctrl + Shift + ,", "Cmd + Shift + ,"]
+            ]],
+            ["Абзацы и Списки", "Paragraphs & Lists", [
+                ["Обычный текст", "Normal Text", "Ctrl + Alt + 0", "Cmd + Opt + 0"],
+                ["Заголовок (1–6)", "Heading 1-6", "Ctrl + Alt + 1-6", "Cmd + Opt + 1-6"],
+                ["По левому краю", "Align Left", "Ctrl + Shift + L", "Cmd + Shift + L"],
+                ["По центру", "Align Center", "Ctrl + Shift + E", "Cmd + Shift + E"],
+                ["По правому краю", "Align Right", "Ctrl + Shift + R", "Cmd + Shift + R"],
+                ["По ширине", "Justify", "Ctrl + Shift + J", "Cmd + Shift + J"],
+                ["Увеличить отступ", "Increase Indent", "Ctrl + ]", "Cmd + ]"],
+                ["Уменьшить отступ", "Decrease Indent", "Ctrl + [", "Cmd + ["],
+                ["Нумерованный список", "Numbered List", "Ctrl + Shift + 7", "Cmd + Shift + 7"],
+                ["Маркированный список", "Bulleted List", "Ctrl + Shift + 8", "Cmd + Shift + 8"],
+                ["Чек-лист (задачи)", "Checklist", "Ctrl + Shift + 9", "Cmd + Shift + 9"],
+                ["Сдвиг строки ↑ / ↓", "Move Paragraph ↑ / ↓", "Ctrl + Shift + ↑/↓", "Cmd + Shift + ↑/↓"]
+            ]],
+            ["Медиа, Таблицы и Комменты", "Media, Tables & Comments", [
+                ["Добавить комментарий", "Insert Comment", "Ctrl + Alt + M", "Cmd + Opt + M"],
+                ["Открыть ветку комментов", "Open Comment Thread", "Ctrl + Alt + Shift + A", "Cmd + Opt + Shift + A"],
+                ["Добавить Alt text", "Add Alt Text", "Ctrl + Alt + Y", "Cmd + Opt + Y"],
+                ["Увеличить картинку", "Resize Image Larger", "Ctrl + Alt + K", "Cmd + Ctrl + K"],
+                ["Уменьшить картинку", "Resize Image Smaller", "Ctrl + Alt + J", "Cmd + Ctrl + J"],
+                ["Навигация по таблице", "Move in Table", "Tab / Shift + Tab", "Tab / Shift + Tab"]
+            ]]
+        ]},
+        gs: { id: "gs", logo: "GS", title: "GOOGLE SHEETS", color: "#0f9d58", meta: ["<a href='https://support.google.com/docs/answer/181110' target='_blank'>ГОРЯЧИЕ КЛАВИШИ GOOGLE SHEETS</a>", "<a href='https://support.google.com/docs/answer/181110' target='_blank'>GOOGLE SHEETS KEYBOARD SHORTCUTS</a>"], data: [
+            ["Действия и навигация", "Actions & Navigation", [
+                ["Копировать", "Copy", "Ctrl + C", "Cmd + C"],
+                ["Вырезать", "Cut", "Ctrl + X", "Cmd + X"],
+                ["Вставить", "Paste", "Ctrl + V", "Cmd + V"],
+                ["Вставить значения", "Paste Values Only", "Ctrl + Shift + V", "Cmd + Shift + V"],
+                ["Отменить", "Undo", "Ctrl + Z", "Cmd + Z"],
+                ["Повторить", "Redo", "Ctrl + Y", "Cmd + Y"],
+                ["Найти", "Find", "Ctrl + F", "Cmd + F"],
+                ["Заменить", "Find and Replace", "Ctrl + H", "Cmd + Shift + H"],
+                ["Край данных", "Move to Edge of Data", "Ctrl + Стрелки", "Cmd + Arrows"],
+                ["Выделить массив", "Select Data Array", "Ctrl + Shift + Стрелки", "Cmd + Shift + Arrows"],
+                ["Список шорткатов", "Shortcuts List", "Ctrl + /", "Cmd + /"],
+                ["Поиск по меню", "Search Menus", "Alt + /", "Opt + /"],
+                ["Скрыть меню", "Compact Controls", "Ctrl + Shift + F", "Ctrl + Shift + F"]
+            ]],
+            ["Строки и столбцы", "Rows & Columns", [
+                ["Выделить столбец", "Select Column", "Ctrl + Space", "Ctrl + Space"],
+                ["Выделить строку", "Select Row", "Shift + Space", "Shift + Space"],
+                ["Выделить всё", "Select All", "Ctrl + A", "Cmd + A"],
+                ["Добавить строку/столбец", "Insert Row/Column", "Ctrl + Alt + =", "Cmd + Opt + ="],
+                ["Удалить строку/столбец", "Delete Row/Column", "Ctrl + Alt + -", "Cmd + Opt + -"],
+                ["Скрыть строку", "Hide Row", "Ctrl + Alt + 9", "Cmd + Opt + 9"],
+                ["Скрыть столбец", "Hide Column", "Ctrl + Alt + 0", "Cmd + Opt + 0"],
+                ["Новый лист", "Insert New Sheet", "Shift + F11", "Shift + F11"],
+                ["Следующий лист", "Move to Next Sheet", "Alt + ↓", "Opt + ↓"],
+                ["Предыдущий лист", "Move to Prev Sheet", "Alt + ↑", "Opt + ↑"]
+            ]],
+            ["Данные и формулы", "Data & Formulas", [
+                ["Заполнить диапазон", "Fill Range", "Ctrl + Enter", "Cmd + Return"],
+                ["Скопировать сверху", "Fill Down", "Ctrl + D", "Cmd + D"],
+                ["Скопировать слева", "Fill Right", "Ctrl + R", "Cmd + R"],
+                ["Текущая дата", "Insert Current Date", "Ctrl + ;", "Cmd + ;"],
+                ["Текущее время", "Insert Current Time", "Ctrl + Shift + ;", "Cmd + Shift + ;"],
+                ["Вставить ссылку", "Insert Link", "Ctrl + K", "Cmd + K"],
+                ["Перенос строки в ячейке", "Insert Newline", "Alt + Enter", "Opt + Return"],
+                ["Абсолютная ссылка / Повтор", "Absolute Reference / F4", "F4", "F4"],
+                ["Вставить формулу массива", "Insert Array Formula", "Ctrl + Shift + Enter", "Cmd + Shift + Return"],
+                ["Показать все формулы", "Show All Formulas", "Ctrl + ~", "Cmd + ~"]
+            ]],
+            ["Формат ячеек", "Cell Formatting", [
+                ["Жирный", "Bold", "Ctrl + B", "Cmd + B"],
+                ["Курсив", "Italic", "Ctrl + I", "Cmd + I"],
+                ["Подчеркнутый", "Underline", "Ctrl + U", "Cmd + U"],
+                ["Зачеркнутый", "Strikethrough", "Alt + Shift + 5", "Opt + Shift + 5"],
+                ["Влево", "Align Left", "Ctrl + Shift + L", "Cmd + Shift + L"],
+                ["По центру", "Align Center", "Ctrl + Shift + E", "Cmd + Shift + E"],
+                ["Вправо", "Align Right", "Ctrl + Shift + R", "Cmd + Shift + R"],
+                ["Сбросить формат", "Clear Formatting", "Ctrl + \\", "Cmd + \\"],
+                ["Добавить внешние границы", "Apply Outer Borders", "Ctrl + Shift + 7", "Cmd + Shift + 7"],
+                ["Удалить границы", "Remove Borders", "Ctrl + Shift + 6", "Cmd + Shift + 6"]
+            ]],
+            ["Формат чисел", "Number Formatting", [
+                ["Десятичный", "Decimal Format", "Ctrl + Shift + 1", "Ctrl + Shift + 1"],
+                ["Время", "Time Format", "Ctrl + Shift + 2", "Ctrl + Shift + 2"],
+                ["Дата", "Date Format", "Ctrl + Shift + 3", "Ctrl + Shift + 3"],
+                ["Валюта", "Currency Format", "Ctrl + Shift + 4", "Ctrl + Shift + 4"],
+                ["Проценты", "Percentage Format", "Ctrl + Shift + 5", "Ctrl + Shift + 5"],
+                ["Экспоненциальный", "Exponential Format", "Ctrl + Shift + 6", "Ctrl + Shift + 6"]
+            ]]
+        ]},
+        np: { id: "np", logo: "NP", title: "NOTEPAD++", color: "#15803d", meta: ["НАСТРОЙКИ > ГОРЯЧИЕ КЛАВИШИ", "SETTINGS > KEYBOARD SHORTCUTS"], data: [
+            ["Файл", "File", [
+                ["Новый файл", "New File", "Ctrl + N"],
+                ["Открыть файл", "Open File", "Ctrl + O"],
+                ["Сохранить", "Save", "Ctrl + S"],
+                ["Сохранить как", "Save As", "Ctrl + Alt + S"],
+                ["Сохранить все", "Save All", "Ctrl + Shift + S"],
+                ["Закрыть вкладку", "Close Tab", "Ctrl + W"],
+                ["Закрыть все вкладки", "Close All", "Ctrl + Shift + W"],
+                ["Печать", "Print", "Ctrl + P"],
+                ["Свойства файла", "File Properties", "Alt + Enter"]
+            ]],
+            ["Правка", "Edit", [
+                ["Отменить", "Undo", "Ctrl + Z"],
+                ["Повторить", "Redo", "Ctrl + Y"],
+                ["Вырезать", "Cut", "Ctrl + X"],
+                ["Копировать", "Copy", "Ctrl + C"],
+                ["Вставить", "Paste", "Ctrl + V"],
+                ["Дублировать строку", "Duplicate Line", "Ctrl + D"],
+                ["Вырезать строку", "Cut Line", "Ctrl + L"],
+                ["Удалить строку", "Delete Line", "Ctrl + Shift + L"],
+                ["Поменять с предыдущей", "Transpose Line", "Ctrl + T"],
+                ["Сдвиг строки ↑ / ↓", "Move Line Up/Down", "Ctrl + Shift + ↑/↓"],
+                ["Нижний регистр", "To Lowercase", "Ctrl + U"],
+                ["Верхний регистр", "To Uppercase", "Ctrl + Shift + U"],
+                ["Собственный регистр", "Proper Case", "Alt + U"],
+                ["Комментировать строку", "Toggle Comment", "Ctrl + Q"],
+                ["Блочное комментирование", "Block Comment", "Ctrl + Shift + Q"]
+            ]],
+            ["Поиск и Вид", "Search & View", [
+                ["Найти", "Find", "Ctrl + F"],
+                ["Найти и заменить", "Replace", "Ctrl + H"],
+                ["Найти в файлах", "Find in Files", "Ctrl + Shift + F"],
+                ["Найти далее", "Find Next", "F3"],
+                ["Найти предыдущее", "Find Previous", "Shift + F3"],
+                ["Поиск выделенного (вперед)", "Find Volatile Next", "Ctrl + F3"],
+                ["Поиск выделенного (назад)", "Find Volatile Prev", "Ctrl + Shift + F3"],
+                ["Перейти к строке", "Go to Line", "Ctrl + G"],
+                ["Полноэкранный режим", "Toggle Fullscreen", "F11"],
+                ["Масштаб (+ / -)", "Zoom In/Out", "Ctrl + Scroll"],
+                ["Сбросить масштаб", "Reset Zoom", "Ctrl + Num /"],
+                ["Следующая вкладка", "Next Tab", "Ctrl + Tab / PgDn"],
+                ["Предыдущая вкладка", "Prev Tab", "Ctrl + Shift + Tab"],
+                ["Свернуть все блоки", "Collapse All", "Alt + 0"],
+                ["Развернуть все блоки", "Uncollapse All", "Alt + Shift + 0"],
+                ["Свернуть текущий уровень", "Collapse Current", "Ctrl + Alt + F"],
+                ["Развернуть тек. уровень", "Uncollapse Current", "Ctrl + Alt + Shift + F"]
+            ]],
+            ["Макросы и Закладки", "Macros & Bookmarks", [
+                ["Запись макроса (Старт/Стоп)", "Start/Stop Record Macro", "Ctrl + Shift + R"],
+                ["Воспроизвести макрос", "Playback Macro", "Ctrl + Shift + P"],
+                ["Многократное воспр-е", "Run Macro Multiple Times", "Alt + Shift + P"],
+                ["Поставить закладку", "Toggle Bookmark", "Ctrl + F2"],
+                ["К следующей закладке", "Next Bookmark", "F2"],
+                ["К предыдущей закладке", "Previous Bookmark", "Shift + F2"]
+            ]]
+        ]},
         pp: { id: "pp", logo: "PP", title: "POTPLAYER", color: "#fbbf24", meta: ["НАСТРОЙКИ (F5) > ГОРЯЧИЕ КЛАВИШИ", "PREFERENCES (F5) > KEYBOARD SHORTCUTS"], data: [
             ["Воспроизведение", "Playback", [
                 ["Плей / Пауза", "Play / Pause", "Space / K"],
@@ -1635,6 +1664,241 @@
                 ["Меню повтора отрезка", "A-B Repeat Menu", "B"]
             ]]
         ]},
+        sa: { id: "sa", logo: "SA", title: "STORY ARCHITECT", color: "#41814C", meta: ["НАВИГАТОР > ПАРАМЕТРЫ ПРИЛОЖЕНИЯ > ГОРЯЧИЕ КЛАВИШИ", "NAVIGATOR > APPLICATION SETTINGS > SHORTCUTS"], data: [
+            ["Умная логика TAB / ENTER", "Smart Logic (TAB / ENTER)", [
+                ["CUSTOM_UI_SA", "CUSTOM_UI_SA", "CUSTOM_UI_SA", "CUSTOM_UI_SA"]
+            ]],
+            ["Навигатор и Карта", "Navigator & Map", [
+                ["Сохранить изменения", "Save Changes", "Ctrl + S", "Cmd + S"],
+                ["Импортировать документы", "Import Documents", "Alt + I", "Opt + I"],
+                ["Экспортировать документ", "Export Document", "Alt + E", "Opt + E"],
+                ["Полноэкранный режим", "Fullscreen", "F11", "Cmd + Ctrl + F"],
+                ["Разделить окно", "Split Screen", "F2", "F2"],
+                ["Масштаб карты (Колесико)", "Zoom Board (Scroll)", "Ctrl + Scroll", "Cmd + Scroll"],
+                ["Масштаб карты (+ / -)", "Zoom Board (+ / -)", "Ctrl + +/-", "Cmd + +/-"],
+                ["Перемещение по карте (Pan)", "Pan Board Tool", "Space + Drag", "Space + Drag"],
+                ["Ментальная карта: Вложенный узел", "Mind Map: Child Node", "Ctrl + Enter", "Cmd + Return"],
+                ["Ментальная карта: Соседний узел", "Mind Map: Sibling Node", "Shift + Enter", "Shift + Return"]
+            ]],
+            ["Форматирование", "Formatting", [
+                ["Разделить параграф", "Split Paragraph", "Ctrl + D", "Cmd + D"],
+                ["Полужирный", "Bold", "Ctrl + B", "Cmd + B"],
+                ["Курсив", "Italic", "Ctrl + I", "Cmd + I"],
+                ["Подчеркнутый", "Underline", "Ctrl + U", "Cmd + U"],
+                ["Зачеркнутый", "Strikethrough", "Ctrl + Shift + X", "Cmd + Shift + X"],
+                ["По левому краю", "Align Left", "Ctrl + L", "Cmd + L"],
+                ["По центру", "Align Center", "Ctrl + E", "Cmd + E"],
+                ["По правому краю", "Align Right", "Ctrl + R", "Cmd + R"],
+                ["По ширине", "Justify", "Ctrl + J", "Cmd + J"],
+                ["Сделать заглавными", "Uppercase", "Ctrl + Shift + ↑", "Cmd + Shift + ↑"],
+                ["Сделать строчными", "Lowercase", "Ctrl + Shift + ↓", "Cmd + Shift + ↓"],
+                ["Вырезать", "Cut", "Ctrl + X", "Cmd + X"],
+                ["Копировать", "Copy", "Ctrl + C", "Cmd + C"],
+                ["Вставить", "Paste", "Ctrl + V", "Cmd + V"],
+                ["Вставить без форматирования", "Paste w/o Formatting", "Ctrl + Shift + V", "Cmd + Shift + V"],
+                ["Выбрать всё", "Select All", "Ctrl + A", "Cmd + A"]
+            ]],
+            ["Редактор текста", "Text Editor", [
+                ["Заголовок 1", "Heading 1", "Ctrl + 1", "Cmd + 1"],
+                ["Заголовок 2", "Heading 2", "Ctrl + 2", "Cmd + 2"],
+                ["Заголовок 3", "Heading 3", "Ctrl + 3", "Cmd + 3"],
+                ["Заголовок 4", "Heading 4", "Ctrl + 4", "Cmd + 4"],
+                ["Заголовок 5", "Heading 5", "Ctrl + 5", "Cmd + 5"],
+                ["Заголовок 6", "Heading 6", "Ctrl + 6", "Cmd + 6"],
+                ["Текст", "Text", "Ctrl + 7", "Cmd + 7"],
+                ["Заметка по тексту", "Note", "Ctrl + Shift + 0", "Cmd + Shift + 0"]
+            ]],
+            ["Редактор сценария", "Screenplay Editor", [
+                ["Заголовок сцены", "Scene Heading", "Ctrl + 1", "Cmd + 1"],
+                ["Участники сцены", "Scene Characters", "Ctrl + 2", "Cmd + 2"],
+                ["Бит", "Beat", "Ctrl + Shift + 1", "Cmd + Shift + 1"],
+                ["Описание действия", "Action", "Ctrl + 3", "Cmd + 3"],
+                ["Персонаж", "Character", "Ctrl + 4", "Cmd + 4"],
+                ["Ремарка", "Parenthetical", "Ctrl + 5", "Cmd + 5"],
+                ["Реплика", "Dialogue", "Ctrl + 6", "Cmd + 6"],
+                ["Лирика", "Lyric", "Ctrl + 7", "Cmd + 7"],
+                ["Кадр", "Shot", "Ctrl + 8", "Cmd + 8"],
+                ["Переход", "Transition", "Ctrl + 9", "Cmd + 9"],
+                ["Заметка по тексту", "Note", "Ctrl + Shift + 0", "Cmd + Shift + 0"],
+                ["Простой текст", "Action / Text", "Ctrl + 0", "Cmd + 0"],
+                ["Группа", "Group", "Ctrl + Space", "Cmd + Space"],
+                ["Акт", "Act", "Ctrl + Shift + Space", "Cmd + Shift + Space"]
+            ]],
+            ["Редактор комикса", "Comic Editor", [
+                ["Страница", "Page", "Ctrl + 1", "Cmd + 1"],
+                ["Кадр", "Panel", "Ctrl + 2", "Cmd + 2"],
+                ["Описание", "Description", "Ctrl + 3", "Cmd + 3"],
+                ["Персонаж", "Character", "Ctrl + 4", "Cmd + 4"],
+                ["Реплика", "Dialogue", "Ctrl + 5", "Cmd + 5"],
+                ["Заметка по тексту", "Note", "Ctrl + Shift + 0", "Cmd + Shift + 0"],
+                ["Простой текст", "Action / Text", "Ctrl + 0", "Cmd + 0"]
+            ]],
+            ["Редактор аудиопьесы", "Audio Play Editor", [
+                ["Заголовок сцены", "Scene Heading", "Ctrl + 1", "Cmd + 1"],
+                ["Персонаж", "Character", "Ctrl + 2", "Cmd + 2"],
+                ["Реплика", "Dialogue", "Ctrl + 3", "Cmd + 3"],
+                ["Звук", "Sound", "Ctrl + 4", "Cmd + 4"],
+                ["Музыка", "Music", "Ctrl + 5", "Cmd + 5"],
+                ["Сигнал", "Cue", "Ctrl + 6", "Cmd + 6"],
+                ["Заметка по тексту", "Note", "Ctrl + Shift + 0", "Cmd + Shift + 0"],
+                ["Простой текст", "Action / Text", "Ctrl + 0", "Cmd + 0"]
+            ]],
+            ["Редактор пьесы", "Play Editor", [
+                ["Заголовок сцены", "Scene Heading", "Ctrl + 1", "Cmd + 1"],
+                ["Персонаж", "Character", "Ctrl + 2", "Cmd + 2"],
+                ["Ремарка", "Parenthetical", "Ctrl + 3", "Cmd + 3"],
+                ["Реплика", "Dialogue", "Ctrl + 4", "Cmd + 4"],
+                ["Описание действия", "Action", "Ctrl + 5", "Cmd + 5"],
+                ["Заметка по тексту", "Note", "Ctrl + Shift + 0", "Cmd + Shift + 0"],
+                ["Простой текст", "Action / Text", "Ctrl + 0", "Cmd + 0"]
+            ]],
+            ["Редактор романа", "Novel Editor", [
+                ["Заголовок сцены", "Scene Heading", "Ctrl + 1", "Cmd + 1"],
+                ["Бит", "Beat", "Ctrl + Shift + 1", "Cmd + Shift + 1"],
+                ["Текст", "Text", "Ctrl + 2", "Cmd + 2"],
+                ["Заметка по тексту", "Note", "Ctrl + Shift + 0", "Cmd + Shift + 0"],
+                ["Простой текст", "Action / Text", "Ctrl + 0", "Cmd + 0"],
+                ["Глава", "Chapter", "Ctrl + Space", "Cmd + Space"],
+                ["Часть", "Part", "Ctrl + Shift + Space", "Cmd + Shift + Space"]
+            ]]
+        ]},
+        wn: { id: "wn", logo: "OS", title: "SYSTEM OS", color: "#0369a1", meta: ["ГОРЯЧИЕ КЛАВИШИ: <a href='https://support.microsoft.com/ru-ru/windows/%D1%81%D0%BE%D1%87%D0%B5%D1%82%D0%B0%D0%BD%D0%B8%D1%8F-%D0%BA%D0%BB%D0%B0%D0%B2%D0%B8%D1%88-%D0%B2-windows-dcc61a57-8ff0-cffe-9796-cb9706c75eec' target='_blank'>WINDOWS</a> И <a href='https://support.apple.com/ru-ru/102650' target='_blank'>macOS</a>", "KEYBOARD SHORTCUTS: <a href='https://support.microsoft.com/en-us/windows/keyboard-shortcuts-in-windows-dcc61a57-8ff0-cffe-9796-cb9706c75eec' target='_blank'>WINDOWS</a> & <a href='https://support.apple.com/en-us/102650' target='_blank'>macOS</a>"], data: [
+            ["Система", "System & UI", [
+                ["Эмодзи и спецсимволы", "Emoji Panel", "Win + .", "Cmd + Ctrl + Space"],
+                ["История буфера обмена", "Clipboard History", "Win + V", "Cmd + C / V"],
+                ["Скриншот области", "Screenshot Area", "Win + Shift + S", "Cmd + Shift + 4"],
+                ["Запись экрана", "Screen Recording", "Win + Alt + R", "Cmd + Shift + 5"],
+                ["Меню Сисадмина", "Power User Menu", "Win + X", "Opt + Apple Menu"],
+                ["Окно «Выполнить» / Spotlight", "Run / Spotlight Search", "Win + R", "Cmd + Space"],
+                ["Диспетчер задач", "Task Manager / Force Quit", "Ctrl + Shift + Esc", "Cmd + Opt + Esc"],
+                ["Настройки системы", "System Settings", "Win + I", "Cmd + ,"],
+                ["Блокировка системы", "Lock Account", "Win + L", "Cmd + Ctrl + Q"],
+                ["Меню проекции (мониторы)", "Display Projection Menu", "Win + P", "Cmd + F1"],
+                ["Очистить корзину", "Empty Trash", "ПКМ по корзине", "Cmd + Shift + Bksp"]
+            ]],
+            ["Окна и пространство", "Windows & Workspace", [
+                ["Свернуть всё (Рабочий стол)", "Show Desktop", "Win + D", "Cmd + F3"],
+                ["Свернуть всё, кроме активного", "Hide Others", "Win + Home", "Cmd + Opt + H"],
+                ["Свернуть текущее окно", "Minimize Window", "Win + ↓", "Cmd + M"],
+                ["Развернуть окно", "Maximize Window", "Win + ↑", "Ctrl + Cmd + F"],
+                ["Прилепить окно к краю", "Snap Window", "Win + Стрелки", "Fn + Ctrl + Arrows"],
+                ["Переключение окон", "Switch App", "Alt + Tab", "Cmd + Tab"],
+                ["Представление задач", "Task View / Mission Control", "Win + Tab", "Ctrl + ↑"],
+                ["Закрыть программу", "Quit App", "Alt + F4", "Cmd + Q"],
+                ["Закрыть окно", "Close Window", "Ctrl + W", "Cmd + W"],
+                ["Приложения в панели", "Taskbar / Dock Apps", "Win + 1 - 9", "Cmd + 1 - 9"]
+            ]],
+            ["Виртуальные столы", "Virtual Desktops", [
+                ["Создать новый стол", "New Desktop", "Win + Ctrl + D", "F3 -> +"],
+                ["Смена рабочих столов", "Switch Desktop", "Win + Ctrl + ←/→", "Ctrl + ←/→"],
+                ["Закрыть текущий стол", "Close Desktop", "Win + Ctrl + F4", "Opt + Click X"]
+            ]],
+            ["Файловый менеджер", "File Manager", [
+                ["Открыть Проводник / Finder", "Open Explorer / Finder", "Win + E", "Cmd + N"],
+                ["Выделить адресную строку", "Focus Address Bar", "Alt + D / Ctrl + L", "Cmd + L"],
+                ["Создать новую папку", "New Folder", "Ctrl + Shift + N", "Cmd + Shift + N"],
+                ["Переименовать", "Rename", "F2", "Return"],
+                ["Удалить в корзину", "Move to Trash", "Del", "Cmd + Bksp"],
+                ["Удалить безвозвратно", "Delete Permanently", "Shift + Del", "Cmd + Opt + Bksp"],
+                ["Свойства файла/папки", "File Properties / Info", "Alt + Enter", "Cmd + I"],
+                ["Область предпросмотра", "Preview Pane / Quick Look", "Alt + P", "Space"],
+                ["Панель сведений", "Details Pane / Show Preview", "Alt + Shift + P", "Cmd + Shift + P"]
+            ]]
+        ]},
+        tg: { id: "tg", logo: "TG", title: "TELEGRAM", color: "#24a1de", meta: ["НАСТРОЙКИ > ГОРЯЧИЕ КЛАВИШИ", "SETTINGS > KEYBOARD SHORTCUTS"], data: [
+            ["Приложение", "Application", [
+                ["Закрытие окна", "Close Window", "Ctrl + W", "Cmd + W"],
+                ["Блокировка приложения", "Lock Telegram", "Ctrl + L", "Cmd + L"],
+                ["Сворачивание окна", "Minimize Window", "Ctrl + M", "Cmd + M"],
+                ["Выход из приложения", "Quit Telegram", "Ctrl + Q", "Cmd + Q"],
+                ["Полноэкранный режим видео", "Fullscreen Video", "Ctrl + `", "Cmd + `"]
+            ]],
+            ["Навигация", "Navigation", [
+                ["Поиск сообщений", "Search Messages", "Ctrl + F", "Cmd + F"],
+                ["Предыдущий чат", "Previous Chat", "Alt + ↑", "Opt + ↑"],
+                ["Следующий чат", "Next Chat", "Alt + ↓", "Opt + ↓"],
+                ["Первый чат", "First Chat", "Ctrl + Alt + Home", "Cmd + Opt + ↑"],
+                ["Последний чат", "Last Chat", "Ctrl + Alt + End", "Cmd + Opt + ↓"],
+                ["Список контактов", "Contacts", "Ctrl + J", "Cmd + J"],
+                ["Архив чатов", "Archived Chats", "Ctrl + 9", "Cmd + 9"],
+                ["Переход в Настройки", "Open Settings", "Ctrl + ,", "Cmd + ,"]
+            ]],
+            ["Папки", "Folders", [
+                ["Избранное", "Saved Messages", "Ctrl + 0", "Cmd + 0"],
+                ["Папка «Все чаты»", "All Chats Folder", "Ctrl + 1", "Cmd + 1"],
+                ["Папка №1 - №6", "Folder 1 - 6", "Ctrl + 2 - 7", "Cmd + 2 - 7"],
+                ["Последняя папка", "Last Folder", "Ctrl + 8", "Cmd + 8"],
+                ["Следующая папка", "Next Folder", "Ctrl + Shift + ↓", "Cmd + Shift + ↓"],
+                ["Предыдущая папка", "Previous Folder", "Ctrl + Shift + ↑", "Cmd + Shift + ↑"]
+            ]],
+            ["Чат и Сообщения", "Chat & Messaging", [
+                ["Автопрочтение чата", "Mark as Read", "Ctrl + R", "Cmd + R"],
+                ["Просмотр меню чата", "Chat Menu", "Ctrl + \\", "Cmd + \\"],
+                ["Предпросмотр чата", "Preview Chat", "Ctrl + ]", "Cmd + ]"],
+                ["Жирный текст", "Bold Text", "Ctrl + B", "Cmd + B"],
+                ["Курсивный текст", "Italic Text", "Ctrl + I", "Cmd + I"],
+                ["Моноширинный текст", "Monospace Text", "Ctrl + Shift + M", "Cmd + Shift + M"],
+                ["Зачеркнутый текст", "Strikethrough", "Ctrl + Shift + X", "Cmd + Shift + X"],
+                ["Скрытый текст (Спойлер)", "Spoiler Text", "Ctrl + Shift + P", "Cmd + Shift + P"],
+                ["Добавить ссылку", "Insert Link", "Ctrl + K", "Cmd + K"]
+            ]]
+        ]},
+        tc: { id: "tc", logo: "TC", title: "TOTAL COMMANDER", color: "#3730a3", meta: ["СПРАВКА > ГОРЯЧИЕ КЛАВИШИ", "HELP > KEYBOARD SHORTCUTS"], data: [
+            ["Файлы", "File Operations", [
+                ["Просмотр (Lister)", "View (Lister)", "F3"], 
+                ["Редактировать", "Edit", "F4"], 
+                ["Копировать", "Copy", "F5"], 
+                ["Копировать в ту же папку", "Copy in Same Dir", "Shift + F5"],
+                ["Переименовать / Переместить", "Rename / Move", "F6"], 
+                ["Создать каталог", "New Folder", "F7"], 
+                ["Удалить", "Delete", "F8 / Del"],
+                ["Удалить без корзины", "Delete Permanently", "Shift + F8 / Shift + Del"],
+                ["Свойства файла", "Properties", "Alt + Enter"]
+            ]],
+            ["Навигация", "Navigation", [
+                ["Переключить панель", "Switch Panel", "Tab"], 
+                ["Диск слева", "Left Drive", "Alt + F1"], 
+                ["Диск справа", "Right Drive", "Alt + F2"], 
+                ["Избранные каталоги", "Directory Hotlist", "Ctrl + D"], 
+                ["История каталогов", "Directory History", "Alt + ↓"], 
+                ["На уровень вверх", "Go Up Dir", "Bksp"], 
+                ["В корневой каталог", "Go to Root", "Ctrl + \\"],
+                ["Обновить панель", "Refresh Panel", "F2 / Ctrl + R"]
+            ]],
+            ["Работа с вкладками", "Tabs", [
+                ["Новая вкладка", "New Tab", "Ctrl + T"], 
+                ["Каталог в новой вкладке", "Open Dir in New Tab", "Ctrl + ↑"], 
+                ["Закрыть вкладку", "Close Tab", "Ctrl + W"], 
+                ["Закрыть все вкладки", "Close All Tabs", "Ctrl + Shift + W"], 
+                ["Вкладка вперед/назад", "Switch Tabs", "Ctrl + Tab"]
+            ]],
+            ["Выделение", "Selection", [
+                ["Выделить / Снять (со сдвигом)", "Select / Unselect", "Insert"], 
+                ["Выделить по маске", "Select Group", "Num +"], 
+                ["Снять выделение по маске", "Unselect Group", "Num -"],
+                ["Инвертировать выделение", "Invert Selection", "Num *"], 
+                ["Выделить всё", "Select All", "Ctrl + A / Num +"], 
+                ["Снять выделение со всех", "Unselect All", "Ctrl + Num -"], 
+                ["Выделить по расширению", "Select by Extension", "Alt + Num +"]
+            ]],
+            ["Архивы и Сеть", "Archives & Network", [
+                ["Упаковать в архив", "Pack Files", "Alt + F5"], 
+                ["Распаковать архив", "Unpack Files", "Alt + F9"], 
+                ["Проверить архив", "Test Archive", "Alt + Shift + F9"],
+                ["Новое FTP соединение", "New FTP Connection", "Ctrl + N"],
+                ["Отключиться от FTP", "Disconnect FTP", "Ctrl + Shift + F"]
+            ]],
+            ["Спец. команды", "Special Commands", [
+                ["Новый текстовый файл", "New Text File", "Shift + F4"], 
+                ["Переименовать на месте", "Rename in Place", "Shift + F6"], 
+                ["Массовое переименов-е", "Multi-Rename Tool", "Ctrl + M"], 
+                ["Плоский список файлов", "Branch View", "Ctrl + B"], 
+                ["Просмотр во 2-й панели", "Quick View Panel", "Ctrl + Q"], 
+                ["Подсчитать объем", "Calculate Space", "Ctrl + L"], 
+                ["Поиск файлов", "Search", "Ctrl + F / Alt+F7"],
+                ["Синхронизация каталогов", "Synchronize Dirs", "Shift + Esc"]
+            ]]
+        ]},
         yt: { id: "yt", logo: "YT", title: "YOUTUBE", color: "#ef4444", meta: ["<a href='https://support.google.com/youtube/answer/7631406' target='_blank'>ГОРЯЧИЕ КЛАВИШИ YOUTUBE</a>", "<a href='https://support.google.com/youtube/answer/7631406' target='_blank'>YOUTUBE KEYBOARD SHORTCUTS</a>"], data: [
             ["Воспроизведение", "Playback", [
                 ["Плей / Пауза", "Play / Pause", "Space / K", "Space / K"],
@@ -1676,7 +1940,7 @@
         if (colData) collapsedStates = JSON.parse(colData);
     } catch(e) {}
     
-    let currentApp = 'tg'; 
+    let currentApp = 'ae'; 
 
     function getCols() {
         if (window.innerWidth <= 1024) return 1;
@@ -1801,7 +2065,7 @@
         const isFav = favorites.includes(strId);
         const activeFavStyle = isFav ? `style="color: var(--current-color);"` : '';
         
-        if (keysWin === "CUSTOM_UI") {
+        if (keysWin === "CUSTOM_UI" || keysWin === "CUSTOM_UI_SA") {
             return currentLang === 'ru' ? descRU : descEN;
         }
 
@@ -1873,8 +2137,12 @@
                     let targetKey = keysWin;
                     if (!isWinOnly && currentOS === 'mac' && keysMac !== undefined) targetKey = keysMac;
 
-                    if (keysWin === "CUSTOM_UI") {
-                        if (displayDesc.toLowerCase().includes(query) || app.title.toLowerCase().includes(query)) itemsHtml += displayDesc;
+                    if (keysWin === "CUSTOM_UI" || keysWin === "CUSTOM_UI_SA") {
+                        if (displayDesc.toLowerCase().includes(query) || app.title.toLowerCase().includes(query)) {
+                            itemsHtml += `<div id="${keysWin === "CUSTOM_UI_SA" ? "sa-machine-root" : ""}"></div>`;
+                            if (keysWin === "CUSTOM_UI_SA") setTimeout(renderSAMachine, 0);
+                            else itemsHtml += displayDesc;
+                        }
                     } else {
                         const matchDesc = displayDesc.toLowerCase().includes(query);
                         const matchKey = targetKey.toLowerCase().includes(query);
@@ -2024,13 +2292,23 @@
             app.data.forEach(cat => {
                 let itemsHtml = '';
                 const displayCat = currentLang === 'ru' ? cat[0] : cat[1];
+                let hasSABlock = false;
+
                 cat[2].forEach(item => {
-                    itemsHtml += buildItem(id, cat[1], item[0], item[1], item[2], item[3]);
+                    if (item[2] === "CUSTOM_UI_SA") {
+                        itemsHtml += `<div id="sa-machine-root"></div>`;
+                        hasSABlock = true;
+                    } else {
+                        itemsHtml += buildItem(id, cat[1], item[0], item[1], item[2], item[3]);
+                    }
                 });
+                
                 const catId = `${id}|${cat[1]}`;
                 const catHtml = buildCategoryHTML(catId, displayCat, itemsHtml);
                 document.getElementById(`col-${colIndex}`).innerHTML += catHtml;
                 colIndex = (colIndex + 1) % colsCount;
+
+                if (hasSABlock) setTimeout(renderSAMachine, 0);
             });
         }
     }
