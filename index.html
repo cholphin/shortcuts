@@ -126,15 +126,12 @@
         .nav-btn:hover { background: var(--item-hover); color: var(--text-main); }
         .nav-btn.active { background: var(--active-bg); border-color: var(--border-dim); color: var(--app-color); }
         .nav-left { display: flex; align-items: center; gap: 10px; }
-        .nav-left > span { position: relative; top: -1px; }
         
         .logo-box { 
             font-weight: normal; font-size: 11px; letter-spacing: 0; color: inherit; 
             width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; 
             line-height: 1; border: 1px solid currentColor; border-radius: 4px; transition: opacity 0.2s; opacity: 0.8; 
-            padding-bottom: 2px; 
             box-sizing: border-box;
-            transform: translateY(-1px); 
         }
         .nav-btn:hover .logo-box, .nav-btn.active .logo-box { opacity: 1; }
 
@@ -529,7 +526,7 @@
         `;
     }
 
-    const dualOsApps = ['ae', 'au', 'bl', 'cb', 'cc', 'da', 'gd', 'gs', 'pr', 'ps', 'sa', 'tg', 'yt'];
+    const dualOsApps = ['ae', 'au', 'bl', 'cc', 'cb', 'da', 'gd', 'gs', 'pr', 'ps', 'sa', 'tg', 'yt'];
 
     const rawData = {
         ae: { id: "ae", logo: "AE", title: "ADOBE AFTER EFFECTS", color: "#c084fc", meta: ["<a href='https://helpx.adobe.com/ru/after-effects/using/keyboard-shortcuts-reference.html' target='_blank'>ГОРЯЧИЕ КЛАВИШИ ADOBE AFTER EFFECTS</a>", "<a href='https://helpx.adobe.com/en/after-effects/using/keyboard-shortcuts-reference.html' target='_blank'>ADOBE AFTER EFFECTS KEYBOARD SHORTCUTS</a>"], data: [
@@ -1940,7 +1937,7 @@
         if (colData) collapsedStates = JSON.parse(colData);
     } catch(e) {}
     
-    let currentApp = 'ae'; 
+    let currentApp = 'ae'; // Старт с первой буквы по алфавиту
 
     function getCols() {
         if (window.innerWidth <= 1024) return 1;
